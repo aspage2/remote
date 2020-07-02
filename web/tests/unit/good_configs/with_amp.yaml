@@ -1,0 +1,8 @@
+mode: BCM
+amp:
+  pin: 33
+  onState: HIGH
+channels:
+ - id: fam
+   pin: 4
+   name: Family Room

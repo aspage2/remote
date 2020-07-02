@@ -1,0 +1,78 @@
+
+.image-small {
+    width: 150px;
+    height: 150px;
+}
+
+.image-medium {
+    width: 200px;
+    height: 200px;
+}
+
+.image-large {
+    width: 250px;
+    height: 250px;
+}
+
+.root {
+    display: inline-block;
+    margin: 0 10px 10px 0;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: #100C26;
+}
+
+.root > img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.info-panel {
+    background: rgba(0, 0, 0, 0.8);
+    position: absolute;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding-left: 10px;
+}
+
+.info-panel.normally-hidden {
+    display: none;
+}
+
+.root:hover .info-panel {
+    display: block;
+}
+
+.root:hover .add-button {
+    display: inline-block;
+}
+
+.add-button {
+    display: none;
+    border: none;
+    background: #003242;
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 5px;
+    position: absolute;
+    margin: 5px;
+    bottom: 0;
+    right: 0;
+
+    > svg * {
+        fill: white;
+    }
+
+    &:hover {
+        background: #00c8ff;
+    }
+
+    &:hover > svg * {
+        fill: black;
+    }
+}
+

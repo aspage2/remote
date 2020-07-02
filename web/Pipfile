@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+redis = "*"
+Flask = "*"
+pyyaml = "*"
+"rpi.gpio" = "*"
+jinja2 = ">=2.10.1"
+flask-socketio = "*"
+eventlet = "*"
+gunicorn = "*"
+jsonschema = "*"
+
+[dev-packages]
+pytest = "*"
+black = "<50.*"
+isort = "*"
+pytest-cov = "*"
+flake8 = "*"
+
+[requires]
+python_version = "3.7"

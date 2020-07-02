@@ -1,0 +1,76 @@
+/**
+Disable text selection
+anchor the listbox div
+maintain height displacement in the listbox's parent
+ */
+.listbox-root {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    height: 36px;
+    position: relative;
+    text-align: left;
+}
+
+/**
+Contain the elements of the listbox
+ */
+.listbox-container {
+    position: absolute; /* disconnect from document to not "push" other elements */
+    border-radius: 3px;
+    border: 1px solid #239cca;
+    min-height: 36px;
+    width: 100%;
+}
+
+.listbox-container .curr-holder {
+    font-size: 16px;
+    line-height: 36px;
+    padding-left: 10px;
+    color: #464866;
+}
+
+.listbox-container .curr-holder.has-selection {
+    color: white;
+}
+
+.listbox-container:focus > .curr-holder {
+    border-bottom: 1px solid #239cca;
+}
+
+
+.listbox-choices {
+    background: #25274d;
+}
+/* Hide the list box contents when not in focus */
+.listbox-container:not(:focus) > .listbox-choices {
+    display: none;
+}
+
+.listbox-container > .listbox-choices > .listbox-choice {
+    cursor: pointer;
+    height: 36px;
+    padding-left: 10px;
+    line-height: 36px;
+}
+
+.listbox-container > .listbox-choices > .listbox-choice:hover {
+    background: #464866;
+}
+
+.listbox-container .listbox-icon {
+    float: right;
+    padding-right: 10px;
+}
+
+.listbox-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: white;
+}
+
+.listbox-container:focus .listbox-icon svg {
+    transform: scaleY(-1);
+}
+

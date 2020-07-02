@@ -1,0 +1,29 @@
+
+
+.card {
+    font-family: Lato, sans-serif;
+    position:fixed;
+    top: -65px;
+    right: 30px;
+    background: white;
+    border: 1px solid black;
+    transition: top 300ms;
+    padding: 5px 15px;
+}
+
+.card.shown {
+    top: 20px;
+}
+
+.card > div {
+    font-size: 1.2rem;
+    color: black;
+    display: inline-block;
+    height: 50px;
+    line-height: 50px;
+    margin-right: 5px;
+    vertical-align: middle;
+    min-width: 156px;
+}
+
+

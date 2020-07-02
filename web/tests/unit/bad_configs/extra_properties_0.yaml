@@ -1,0 +1,7 @@
+mode: BCM
+what: who
+channels:
+  - id: chan1
+    num: 33
+    name: What
+maxActiveChannels: 2

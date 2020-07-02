@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>PNP Remote</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        var INITIAL_STATUS = {{ status|safe }};
+        var ALBUM_ART_URL = "{{ album_art_url|safe }}";
+    </script>
+    <script src="/static/dist/remote.js"></script>
+</body>
+</html>

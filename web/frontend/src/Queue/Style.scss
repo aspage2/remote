@@ -1,0 +1,70 @@
+
+button {
+    border: none;
+    border-radius: 2px;
+    padding: 7px;
+
+    &.clearQueue {
+        background: #7d1c2b;
+        color: white;
+        margin-right: 20px;
+    }
+
+    &.toggle {
+        background: #525252;
+        color: white;
+        width: 127px;
+        margin-right: 3px;
+        &.enabled {
+            background: #3A7734;
+            color: black;
+        }
+    }
+}
+
+.queueItem {
+    background: #808ed1;
+    padding: 7px 10px;
+    color: black;
+    border-radius: 5px;
+    margin: 5px;
+    display: inline-block;
+    box-sizing: border-box;
+
+    > * {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    &.selected {
+        background: #52D184;
+    }
+
+    &:hover {
+        border: 2px solid white;
+        padding: 5px 8px;
+    }
+}
+
+.songInfo {
+    width: 400px
+}
+
+.trackTitle {
+    font-weight: bold;
+}
+
+.trackDetails {
+    font-size: 0.9rem
+}
+
+.removeItem {
+    background: #003242;
+    color: white;
+
+    &:hover {
+        background: #00c8ff;
+        color: black;
+        font-weight: bold;
+    }
+}

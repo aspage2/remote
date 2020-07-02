@@ -1,0 +1,17 @@
+[General]
+amp=6
+mode=BCM
+
+[Numbers]
+fam=4
+bas=22
+gar=27
+out=17
+shop=5
+
+[Descriptions]
+fam=Family Room
+bas=Basement
+gar=Garage
+out=Back Yard
+shop=Workshop

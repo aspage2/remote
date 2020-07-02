@@ -1,0 +1,8 @@
+mode: WHAT
+amp:
+  pin: 6
+  onState: LOW
+channels:
+ - id: fam
+   pin: 4
+   name: Family Room

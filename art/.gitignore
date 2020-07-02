@@ -1,0 +1,10 @@
+requirements.txt
+docker-compose.*
+.idea
+.egg-info
+__pycache__
+.env
+.venv
+album-images
+remote-art.tar
+

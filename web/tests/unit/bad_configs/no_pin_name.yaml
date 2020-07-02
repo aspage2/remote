@@ -1,0 +1,6 @@
+mode: BCM
+amp:
+  pin: 6
+channels:
+ - id: fam
+   pin: 4

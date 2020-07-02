@@ -1,0 +1,6 @@
+mode: BCM
+channels:
+ - id: fam
+   pin: 4
+   name: Family Room
+maxActiveChannels: 2

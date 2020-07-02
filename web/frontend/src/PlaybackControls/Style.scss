@@ -1,0 +1,83 @@
+$status-bar-height: 100px;
+
+.root {
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+    height: $status-bar-height;
+    background: #464866;
+
+    > * {
+        display: inline-block;
+    }
+}
+
+.now-playing {
+    > img {
+        height: $status-bar-height;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    > .no-album-art {
+        background: grey;
+        width: $status-bar-height;
+        height: $status-bar-height;
+        display: inline-block;
+        vertical-align: middle;
+    }
+}
+
+.song-info {
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 0 15px 0 10px;
+    width: 400px;
+
+    > * {
+        white-space: nowrap;
+        overflow-x: hidden;
+        -ms-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+        margin: 3px 0;
+    }
+
+    > p {
+        font-size: 12px;
+    }
+}
+
+.progressBar {
+    width: 100%;
+    height: 5px;
+    background: grey;
+
+    > .inner {
+        height: 5px;
+        background: blue;
+    }
+}
+
+.playback-buttons {
+    height: $status-bar-height;
+    line-height: $status-bar-height;
+
+    button {
+        background: none;
+        border: none;
+        vertical-align: middle;
+        padding: 0 10px;
+
+        svg {
+            fill: white;
+        }
+
+        &:hover {
+            background: white;
+
+            svg {
+                fill: #25274d;
+            }
+        }
+    }
+}

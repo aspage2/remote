@@ -1,0 +1,5 @@
+[html]
+directory = reports/html
+
+[run]
+data_file = reports/coverage
