@@ -22,9 +22,6 @@ def run_search():
     if not query:
         abort(400, "No Query")
 
-    if len(query) < 4:
-        abort(400, "Querystring must have at least 4 characters")
-
     if page < 0:
         abort(400, "Invalid pagination: {}".format(page))
 

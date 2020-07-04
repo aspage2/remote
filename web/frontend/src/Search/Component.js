@@ -51,8 +51,7 @@ class Search extends React.Component {
 
     handleTimeout() {
         const query = this.state.query;
-        if (query.length < 4)
-            return;
+	if (query.length <= 1) return;
         this.setState({
             loaded: false
         }, () => {

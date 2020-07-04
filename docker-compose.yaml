@@ -35,7 +35,9 @@ services:
       REDIS_HOST: redis
       MPD_HOST: mpd
       ALBUM_ART_URL: localhost:5001
+      PINOUT_FILE: /data/pins.yaml
     volumes:
       - ./web/dist/remote.js:/code/remote/static/dist/remote.js
+      - ./web/pins.yaml:/data/pins.yaml
     ports:
       - 5000:80
