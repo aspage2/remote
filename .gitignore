@@ -2,7 +2,7 @@
 node_modules/
 
 fake_mpd/database/
-fake_mpd/music/
+fake_mpd/music/add_your_music_here
 fake_mpd/playlists/
 fake_mpd/store/
 
