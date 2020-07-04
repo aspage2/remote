@@ -1,7 +1,10 @@
 
+node_modules/
+
 fake_mpd/database/
 fake_mpd/music/
 fake_mpd/playlists/
+fake_mpd/store/
 
 .idea/
 .vscode/

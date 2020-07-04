@@ -15,5 +15,5 @@ RUN apk add --virtual build-deps build-base; \
     apk del build-deps
 
 COPY remote /code/remote/
-COPY docker/docker-entrypoint.sh /code/
+COPY docker-entrypoint.sh /code/
 

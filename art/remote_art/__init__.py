@@ -4,7 +4,7 @@ import os
 from shutil import copyfile
 
 from PIL import Image
-from flask import Flask, abort, send_file
+from flask import Flask, abort, send_file, send_from_directory
 from .mpd_socket import MPDSocket
 
 from .utils import absolute_image_path, get_single_file_from_mpd, look_for_image_in_dir, get_image_from_apic
@@ -46,4 +46,4 @@ def album_art(albumartist, album):
         copyfile(image_file, hash_filename)
         return send_file(hash_filename)
 
-    abort(404)
+    return send_from_directory("static", "notfound.png") 

@@ -10,6 +10,6 @@
         var INITIAL_STATUS = {{ status|safe }};
         var ALBUM_ART_URL = "{{ album_art_url|safe }}";
     </script>
-    <script src="/static/dist/remote.js"></script>
+		<script src="{{url_for('static', filename='dist/remote.js')}}"></script>
 </body>
 </html>
