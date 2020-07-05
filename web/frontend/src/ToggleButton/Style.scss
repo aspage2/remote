@@ -1,0 +1,22 @@
+button.toggle-button {
+    text-align: center;
+    width: 156px;
+    border-radius: 5px;
+    height: 36px;
+    margin: 3px;
+    color: black;
+    border: none;
+    background: #00c8ff;
+    font-weight: bold;
+
+    &:hover {
+        background: #8bf8ff;
+    }
+
+    &.active {
+        background: #003242;
+        border: 2px solid black;
+        color: white;
+    }
+}
+
