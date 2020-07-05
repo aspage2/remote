@@ -8,21 +8,6 @@
         color: black;
     }
 
-    .channel {
-        width:100%;
-        border: none;
-        background: #00c8ff;
-
-        &:hover {
-            background: #8bf8ff;
-        }
-        &.active {
-            background: #003242;
-            border: 2px solid black;
-            color: white;
-        }
-    }
-
     .off {
         width: 106px;
         border: none;

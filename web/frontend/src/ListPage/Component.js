@@ -14,7 +14,7 @@ export default function ListPage(props) {
 
     let c;
     if (!loaded)
-        c = <h1>Loading</h1>;
+        c = <div/>;
     else if (err)
         c = <h1>Error</h1>;
     else {

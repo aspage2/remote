@@ -46,4 +46,9 @@ def album_art(albumartist, album):
         copyfile(image_file, hash_filename)
         return send_file(hash_filename)
 
+    abort(404)
+
+
+@app.route("/notfound.jpg")
+def not_found():
     return send_from_directory("static", "notfound.png") 

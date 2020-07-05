@@ -6,6 +6,8 @@ import _ from 'lodash';
 import styles from './Style.scss';
 import {SocketContext} from "../socket";
 
+// mostCommonValue returns the value which makes up the majority of
+// items in a set.
 const mostCommonValue = (l, k) => (
     _.maxBy(
         _.toPairs(_.groupBy(l, k)),
@@ -18,7 +20,7 @@ function AlbumPage({socket, album, albumartist}) {
 
     const {loaded, err, data} = useMusicDatabaseQuery(`/data/albumartist/${albumartist}/album/${album}`);
     if (!loaded)
-        return <h3>Loading...</h3>;
+        return <div/>;
     if (err)
         return <h3>Error</h3>;
 

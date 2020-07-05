@@ -9,16 +9,23 @@ import styles from "./Style.scss";
 import {albumArtUrl} from "../urls";
 
 export default function AlbumCard(props){
-    const info_class = classNames({
-        [styles['info-panel']]: true,
-        [styles['normally-hidden']]: props.hideDetails
-    });
+
+    const [err, setErr] = React.useState(false);
 
     const {info:{album, albumartist, date}, buttonClick} = props;
     const src = albumArtUrl({album, albumartist});
 
+    const info_class = classNames({
+        [styles['info-panel']]: true,
+        [styles['normally-hidden']]: !err && props.hideDetails
+    });
+
     return <div className={`${styles['image-medium']} ${styles.root} floating`}>
-        <img src={src} alt={album} />
+        <img
+            src={err ? `http://${ALBUM_ART_URL}/notfound.jpg` : src}
+            alt={album}
+            onError={() => setErr(true)}
+        />
         <div className={info_class} onClick={_.partial(props.onClick, album, albumartist)}>
             <h3>{album}</h3>
             <p className={styles.infoPanel}>{albumartist}</p>
