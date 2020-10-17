@@ -1,10 +1,7 @@
 import os
 
-from flask import current_app
-
 from remote.gpio.controller import GPIOController
 from remote.gpio.gpio_config import GPIOConfig
-from remote.mpd_socket import MPDSocket
 
 gpio = None
 mpd = None
@@ -18,23 +15,11 @@ def get_gpio() -> GPIOController:
     """
 
     global gpio
-    if gpio is None and current_app.config.get("PINOUT_FILE") is not None:
-        pinout = GPIOConfig.from_yaml(current_app.config["PINOUT_FILE"])
+    if gpio is None and os.environ.get("PINOUT_FILE") is not None:
+        pinout = GPIOConfig.from_yaml(os.environ["PINOUT_FILE"])
         gpio = GPIOController(pinout)
 
     return gpio
-
-
-def get_mpd() -> MPDSocket:
-    """
-    Get a singleton instance of an MPD socket
-    """
-    global mpd
-
-    if mpd is None:
-        mpd = MPDSocket(current_app.config["MPD_HOST"])
-
-    return mpd
 
 
 def get_envvars(*required, optional=None, defaults=None):

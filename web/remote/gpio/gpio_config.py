@@ -6,7 +6,7 @@ import yaml
 
 try:
     import RPi.GPIO as rp
-except RuntimeError:
+except ModuleNotFoundError:
     import remote.gpio.fakeRPi as rp
 
 GPIO_MODE = {"BCM": rp.BCM, "BOARD": rp.BOARD}

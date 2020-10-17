@@ -5,8 +5,10 @@
 }
 
 .image-medium {
-    width: 200px;
-    height: 200px;
+    max-width: 200px;
+    max-height: 200px;
+    width: 100%;
+    height: 100%;
 }
 
 .image-large {
@@ -17,38 +19,28 @@
 .root {
     display: inline-block;
     margin: 0 10px 10px 0;
-    position: relative;
     overflow: hidden;
     cursor: pointer;
-    background: #100C26;
-}
-
-.root > img {
-    max-width: 100%;
-    max-height: 100%;
+    position: relative;
 }
 
 .info-panel {
-    background: rgba(0, 0, 0, 0.8);
-    position: absolute;
-    box-sizing: border-box;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-    padding-left: 10px;
+    padding-left: 5px;
+    line-height: 20px;
+
+    & .album {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
 }
 
-.info-panel.normally-hidden {
-    display: none;
-}
-
-.root:hover .info-panel {
-    display: block;
-}
-
-.root:hover .add-button {
-    display: inline-block;
+.root:hover {
+    .add-button {
+        display: inline-block;
+    }
+    .album {
+        text-decoration: underline;
+    }
 }
 
 .add-button {
@@ -60,7 +52,7 @@
     padding: 5px;
     position: absolute;
     margin: 5px;
-    bottom: 0;
+    top: 0;
     right: 0;
 
     > svg * {

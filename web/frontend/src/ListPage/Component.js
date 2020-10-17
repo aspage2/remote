@@ -1,7 +1,7 @@
 
 import React from 'react';
 import {Link} from 'react-router-dom';
-import {useMusicDatabaseQuery} from "../urls";
+import {useMPDQuery} from "../urls";
 
 import _ from "lodash";
 
@@ -10,7 +10,7 @@ import styles from "./Style.scss"
 export default function ListPage(props) {
     const {title, endPoint, listTransform=_.identity} = props;
 
-    const {loaded, data, err} = useMusicDatabaseQuery(endPoint);
+    const {loaded, data, err} = useMPDQuery(endPoint);
 
     let c;
     if (!loaded)

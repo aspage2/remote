@@ -1,31 +1,38 @@
 
+@import "../Vars";
+
 button {
-    border: none;
-    border-radius: 2px;
-    padding: 7px;
+    &.clearQueue, &.toggle, &.removeItem {
+        border: none;
+        border-radius: 2px;
+        padding: 7px;
+        cursor: pointer;
+    }
+
+    &.clearQueue, &.toggle {
+        font-size: 1.1rem;
+    }
 
     &.clearQueue {
-        background: #7d1c2b;
+        background: #b02c40;
         color: white;
         margin-right: 20px;
     }
 
     &.toggle {
-        background: #525252;
-        color: white;
-        width: 127px;
+        background: #bed4e1;
+        width: 156px;
         margin-right: 3px;
+        color: black;
         &.enabled {
-            background: #3A7734;
-            color: black;
+            background: #3ae429;
         }
     }
 }
 
 .queueItem {
-    background: #808ed1;
+    background: $color-list-item;
     padding: 7px 10px;
-    color: black;
     border-radius: 5px;
     margin: 5px;
     display: inline-block;
@@ -37,11 +44,11 @@ button {
     }
 
     &.selected {
-        background: #52D184;
+        background: #0c8b00;
     }
 
     &:hover {
-        border: 2px solid white;
+        border: 2px solid $color-text-dark;
         padding: 5px 8px;
     }
 }
@@ -59,12 +66,11 @@ button {
 }
 
 .removeItem {
-    background: #003242;
+    background: $color-button;
     color: white;
 
     &:hover {
-        background: #00c8ff;
-        color: black;
+        background: $color-button-hover;
         font-weight: bold;
     }
 }

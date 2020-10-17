@@ -1,6 +1,6 @@
 try:
     import RPi.GPIO as rp
-except RuntimeError:
+except ModuleNotFoundError:
     import remote.gpio.fakeRPi as rp
 
 from remote.gpio.gpio_config import GPIOConfig, Pin
@@ -31,6 +31,12 @@ class GPIOController:
             self._state[channel.id] = False
             rp.setup(channel.num, rp.OUT)
             self._gpio_set(channel, False)
+
+    def to_dict(self):
+        return {
+            "active": self.active_channels,
+            "channels": self.channels,
+        }
 
     def __del__(self):
         rp.cleanup()

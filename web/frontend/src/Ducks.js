@@ -2,16 +2,16 @@
 import {combineReducers} from "redux";
 
 import {reducer as SnackbarReducer} from "./Snackbar";
-import {reducer as QueueReducer} from "./Queue";
-import {reducer as PlaybackReducer} from "./PlaybackControls";
-import {reducer as ChannelReducer} from "./ChannelPage";
+import {makeReducer as QueueReducer} from "./Queue";
+import {makeReducer as PlaybackReducer} from "./PlaybackControls";
+import {makeReducer as ChannelReducer} from "./ChannelPage";
 
 
-const reducer = combineReducers({
+const reducer = init => combineReducers({
     snackbar: SnackbarReducer,
-    queue: QueueReducer,
-    playback: PlaybackReducer,
-    channel: ChannelReducer,
+    queue: QueueReducer(init.queue),
+    playback: PlaybackReducer(init.playback),
+    channel: ChannelReducer([]),
 });
 
 export default reducer;

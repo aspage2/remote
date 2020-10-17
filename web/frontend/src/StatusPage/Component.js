@@ -1,8 +1,9 @@
 import React from 'react';
-import {useMusicDatabaseQuery, englishTimeStr} from "../urls";
+import {useMPDQuery, englishTimeStr} from "../urls";
 import classNames from "classnames";
 import styles from "./Styles.scss"
 import {SocketContext} from "../socket";
+import {mpdQuery, objFromData} from "../mpd";
 
 
 const SiteStats = stats => {
@@ -49,8 +50,14 @@ const SiteStats = stats => {
 
 function StatusPage(props) {
 
-    const {data, loading, err} = useMusicDatabaseQuery("/data/stats");
-
+    const {data, loaded, err} = useMPDQuery("stats");
+    if (!loaded) {
+        return <h3>...</h3>;
+    }
+    if (err) {
+        return <h3>Can't get statistics.</h3>
+    }
+    const stats = objFromData(data);
     const updating = props.isUpdating;
 
     return <React.Fragment>
@@ -60,12 +67,11 @@ function StatusPage(props) {
                 Database Update: {updating ? "ON" : "OFF"}
             </div>
         </div>
-        <button onClick={() => {
-            props.socket.emit("dbUpdate");
-        }}>Start Update
+        <button onClick={()=>{mpdQuery("update");}}>
+            Start Update
         </button>
 
-        {loading ? <h3>...</h3> : (err ? <p>Can't get statistics.</p> : <SiteStats {...data}/>)}
+        <SiteStats {...stats}/>
     </React.Fragment>
 }
 

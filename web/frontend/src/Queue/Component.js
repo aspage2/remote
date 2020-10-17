@@ -1,25 +1,31 @@
 import React from 'react';
-import _ from 'lodash';
+
+import partial from "lodash/partial";
+import sortBy from "lodash/sortBy";
+import map from "lodash/map";
+
 import classNames from 'classnames';
-import {SocketContext} from "../socket";
+import {mpdQuery} from "../mpd";
 
 import styles from "./Style.scss";
 
-function QueuePage({queue, playback, socket}) {
+export default function QueuePage({queue, playback}) {
     if (!queue)
         return <h3>Loading...</h3>;
 
-    const tracks = _.sortBy(queue, track => parseInt(track.pos || "10000"));
+    const tracks = sortBy(queue, track => parseInt(track.pos || "10000"));
 
-    const removeItem = pos => socket.emit('queueRemove', pos);
-    const clearQueue = () => socket.emit('queueRemove', 'all');
+    const removeItem = pos => mpdQuery(`delete ${pos}`);
+    const clearQueue = partial(mpdQuery, "clear");
+    const setConsume = curr => mpdQuery(`consume ${curr ? 1 : 0}`);
+    const setRandom = curr => mpdQuery(`random ${curr ? 1 : 0}`);
     const setSong = pos => {
         if (pos !== playback.song)
-            socket.emit('queueSeek', pos);
+            mpdQuery(`seek ${pos} 0`).then(() => mpdQuery("play"))
     };
 
-    const consume = parseInt(playback.consume) === 1;
-    const shuffle = parseInt(playback.random) === 1;
+    const currConsume = parseInt(playback.consume) === 1;
+    const currShuffle = parseInt(playback.random) === 1;
 
     return <React.Fragment>
         <h1>Queue</h1>
@@ -27,20 +33,20 @@ function QueuePage({queue, playback, socket}) {
         <button
             className={classNames(
                 styles.toggle,
-                {[styles.enabled]: consume}
+                {[styles.enabled]: currConsume}
             )}
-            onClick={() => socket.emit("playbackCommand", `consume ${consume ? 0 : 1}`)}
-        >Consume: {consume ? "ON" : "OFF"}
+            onClick={() => setConsume(!currConsume)}
+        >Consume: {currConsume ? "ON" : "OFF"}
         </button>
         <button
             className={classNames(
                 styles.toggle,
-                {[styles.enabled]: shuffle}
+                {[styles.enabled]: currShuffle}
             )}
-            onClick={() => socket.emit("playbackCommand", `random ${shuffle ? 0 : 1}`)}
-        >Shuffle: {shuffle ? "ON" : "OFF"}</button>
+            onClick={() => setRandom(!currShuffle)}
+        >Shuffle: {currShuffle ? "ON" : "OFF"}</button>
         <div style={{height: "10px"}}/>
-        {_.map(tracks, (track, i) =>
+        {map(tracks, (track, i) =>
             <div key={i}>
                 <div
                     className={classNames(
@@ -63,7 +69,3 @@ function QueuePage({queue, playback, socket}) {
         )}
     </React.Fragment>
 }
-
-export default props => <SocketContext.Consumer>
-    {socket => <QueuePage socket={socket} {...props}/>}
-</SocketContext.Consumer>

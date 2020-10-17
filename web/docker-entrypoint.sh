@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
 
 set -e
-
 cd /code
-
-gunicorn --worker-class=eventlet -w 1 --bind=0.0.0.0:80 --access-logfile - --chdir=/code remote:app --reload
+exec uvicorn --host=0.0.0.0 --port=80 remote:app --reload
 

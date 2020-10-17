@@ -1,15 +1,15 @@
-import axios from 'axios';
-
 import {useEffect, useState} from 'react';
 
-import _ from 'lodash';
+import some from 'lodash/some';
+import isEmpty from 'lodash/isEmpty';
+import {mpdQuery} from "./mpd";
 
 /**
  * Hook that handles the loading/err state of a music database query
- * @param path: URL to issue a GET to
+ * @param cmd: MPD query
  * @returns {{loaded: boolean, err: boolean, data: *}}
  */
-export const useMusicDatabaseQuery = (path) => {
+export const useMPDQuery = (cmd) => {
     const [loadState, setLoadState] = useState({
         loaded: false,
         err: false,
@@ -17,32 +17,47 @@ export const useMusicDatabaseQuery = (path) => {
     });
 
     useEffect(() => {
-        if (path !== "") {
+        if (cmd !== "") {
             setLoadState({
                 loaded: false,
                 err: false,
                 data: undefined
             });
-            axios.get(path)
-                .then(res => setLoadState({
+            mpdQuery(cmd)
+                .then(data => setLoadState({
                     loaded: true,
                     err: false,
-                    data: res.data
+                    data,
                 }))
                 .catch(err => setLoadState({
                         loaded: true,
                         err: true,
-                        data: err.response
+                        data: err,
                     })
                 )
 
         }
-    }, [path]);
+    }, [cmd]);
 
     return loadState;
 };
 
-export const albumArtUrl = ({albumartist, album}) => `http://${ALBUM_ART_URL}/art/${albumartist}/${album}`;
+function argsToQuery(args) {
+    args = "hello world";
+    let ret = [];
+    for (const arg of args) {
+        if (args.includes(" ")) {
+            if (!(arg.startsWith("\"") || arg.endsWith("\""))) {
+                ret.push(`"${arg}"`);
+            } else {
+                ret.push(arg);
+            }
+        }
+    }
+    return ret.join(" ");
+}
+
+export const albumArtUrl = ({albumartist, album}) => `/art/${albumartist}/${album}`;
 
 /**
  * Convert seconds to a formatted song duration
@@ -57,7 +72,7 @@ export const timeStr = t => {
 };
 
 
-export const areEmpty = (...vals) => _.some(vals, _.isEmpty);
+export const areEmpty = (...vals) => some(vals, isEmpty);
 
 export const englishTimeStr = totalTime => {
     const totalHours = Math.floor(totalTime / 3600);
