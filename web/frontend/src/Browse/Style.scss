@@ -1,0 +1,17 @@
+
+@import "../Vars";
+
+.list {
+  list-style: none;
+
+  > div {
+    display: inline-block;
+    background: $color-list-item;
+    padding: 7px;
+    border-radius: 5px;
+    margin: 6px;
+    a {
+      color: $color-text-dark
+    }
+  }
+}

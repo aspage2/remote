@@ -1,107 +1,71 @@
-import eventlet
+import asyncio
+import json
+import os
+from fastapi import FastAPI, WebSocket, Response
+from starlette.endpoints import WebSocketEndpoint
+from remote.mpd import COMMAND_BLACKLIST, read_mpd_response, open_mpd
+from remote.util import get_gpio
 
-eventlet.monkey_patch()  # noqa:
+app = FastAPI()
 
-from flask import Flask
-from flask_socketio import SocketIO, emit
-
-from remote.gpio.controller import GPIOException
-from remote.util import get_envvars, get_gpio, get_mpd
-from remote.views.music_db import music
-from remote.views.playback import playback
-from remote.views.search import search
-from remote.views.web import web
-
-
-app = Flask(__name__)
-
-env = get_envvars("REDIS_HOST", "MPD_HOST", "ALBUM_ART_URL", optional=["PINOUT_FILE"], defaults={
-    "REDIS_HOST": "localhost",
-    "MPD_HOST": "localhost",
-    "ALBUM_ART_URL": "localhost",
-})
-app.config.update(env)
-
-socket_io = SocketIO(app, message_queue=f"redis://{app.config['REDIS_HOST']}:6379")
+gpio = get_gpio()
+gpio_lock = asyncio.Lock()
 
 
-@socket_io.on("dbUpdate")
-def start_db_update():
-    mpd = get_mpd()
-    mpd("update")
+@app.get("/gpio/channels")
+def gpio_channels():
+    return gpio.to_dict()
 
 
-@socket_io.on("playbackCommand")
-def playback_command(data: str):
-    """Control playback or volume"""
+@app.websocket("/ws/mpd/command")
+async def mpd_command(websocket: WebSocket):
+    await websocket.accept()
 
-    mpd = get_mpd()
-    cmd = data.strip()
-    allowed_commands = (
-        "volume",
-        "previous",
-        "next",
-        "play",
-        "pause",
-        "random",
-        "consume",
-    )
-    if any(cmd.startswith(c) for c in allowed_commands):
-        mpd(cmd)
+    reader, writer = await open_mpd(os.environ.get("MPD_HOST", "localhost"))
 
-
-@socket_io.on("queueRemove")
-def queue_remove_command(data: str):
-    """
-    Remove a track from the current playlist
-
-    """
-    mpd = get_mpd()
-    if data.lower() == "all":
-        mpd("clear")
-    else:
-        mpd(f"delete {data}")
-
-
-@socket_io.on("findadd")
-def queue_add_command(data: dict):
-    """
-    Add a track to the current playlist
-
-    Args:
-        data - tag, value pairs (artist, album, title, etc.)
-    """
-    mpd = get_mpd()
-    args = " ".join(f'{k} "{v}"' for k, v in data.items())
-    mpd(f"findadd {args}")
-
-
-@socket_io.on("queueSeek")
-def queue_seek_command(pos: str):
-    """Select a song for playback"""
-    mpd = get_mpd()
-    mpd.bulk(f"seek {pos} 0", "play")
-
-
-@socket_io.on("channel")
-def channel_command(chan):
-    """Update GPIO channel output"""
-    gpio = get_gpio()
-    if gpio is None:
-        return {"success": False, "message": "No channels set up"}
-    chan = chan.lower()
-    if chan == "off":
-        gpio.sys_off()
-    else:
+    try:
+        query = (await websocket.receive_text()).strip()
+        if (cmd := query.split(" ", 1)[0]) in COMMAND_BLACKLIST:
+            resp = f"ACK: blacklisted: {cmd}"
+        else:
+            writer.write(f"{query.strip()}\n".encode())
+            resp = (await read_mpd_response(reader)).decode()
+        await websocket.send_text(resp)
+    finally:
+        writer.close()
+        await writer.wait_closed()
         try:
-            gpio.toggle(chan)
-        except GPIOException:
-            return {"success": False, "message": "Max # channels selected"}
-    emit("channel", {"pinout": gpio.channels, "status": gpio.active_channels})
-    return {"success": True}
+            await websocket.close()
+        except:
+            pass
 
 
-app.register_blueprint(music)
-app.register_blueprint(playback)
-app.register_blueprint(web)
-app.register_blueprint(search)
+@app.websocket_route("/ws/mpd/idle")
+class IdleEndpoint(WebSocketEndpoint):
+    async def on_connect(self, websocket: WebSocket) -> None:
+        await websocket.accept()
+        self.task = asyncio.create_task(self.idle_loop(websocket))
+
+    async def on_disconnect(self, websocket: WebSocket, close_code: int) -> None:
+        self.task.cancel()
+
+    async def idle_loop(self, ws: WebSocket):
+        reader, writer = await open_mpd(os.environ.get("MPD_HOST", "localhost"))
+
+        try:
+            while True:
+                writer.write(b"idle\n")
+                await writer.drain()
+                resp = await read_mpd_response(reader)
+                changed = [
+                    line.decode().split(": ", 1)[1]
+                    for line in resp.strip().split(b"\n")
+                    if line != b"OK"
+                ]
+                await ws.send_text(json.dumps(changed))
+        except Exception as e:
+            pass
+        finally:
+            writer.close()
+            await writer.wait_closed()
+            await ws.close()

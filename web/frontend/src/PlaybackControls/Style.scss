@@ -1,30 +1,16 @@
-$status-bar-height: 100px;
+
+@import "../Vars";
 
 .root {
     position: fixed;
     bottom: 0;
     width: 100vw;
     height: $status-bar-height;
-    background: #464866;
+    background: $color-playback-bar;
+    padding-left: $nav-bar-width + 10px;
 
     > * {
         display: inline-block;
-    }
-}
-
-.now-playing {
-    > img {
-        height: $status-bar-height;
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    > .no-album-art {
-        background: grey;
-        width: $status-bar-height;
-        height: $status-bar-height;
-        display: inline-block;
-        vertical-align: middle;
     }
 }
 

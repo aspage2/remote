@@ -1,29 +1,4 @@
 
-body, html {
-    margin: 0;
-    font-family: sans-serif;
-    background: #25274d;
-    color: white;
-}
-
-a {
-    color: #239cca;
-}
-
-a:hover {
-    text-decoration: none;
-}
-
-#browser-root {
-    /* Add padding-bottom to the browse window
-    so content isn't covered by the playback bar */
-    padding: 10px 10px 100px;
-}
-
-#browser-root > img {
-    width: 250px;
-}
-
 .floating {
     box-shadow: 1px 0 6px 1px #2b2b2b;
 }

@@ -1,15 +1,16 @@
 
+@import "../Vars";
+
 .mainInput {
     font-size: 30px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid #239cca;
-    padding: 3px;
-    color: white;
+    background: $color-list-item;
+    border: 2px solid $color-bg-nav;
+    border-radius: 5px;
+    padding: 10px;
     outline:none;
-
+    color: $color-text-dark;
     &::placeholder {
-        color: #d0d0d0
+        color: #d0d0d0;
     }
 }
 
@@ -20,12 +21,14 @@
     margin-right: 10px;
 }
 
+
 .item {
-    background-color: #808ed1;
-    color: black;
+
+    background-color: $color-list-item;
     cursor:pointer;
     margin: 5px;
-    padding: 3px;
+    padding: 8px;
+    font-size: 1.2rem;
     border-radius: 3px;
     position: relative;
 
@@ -64,8 +67,7 @@
     }
 
     button {
-        background: #003242;
-        color: white;
+        background: $color-button;
         border: none;
         top: 0;
         right: 0;
@@ -74,11 +76,11 @@
         margin: 6px;
         position: absolute;
         display: none;
+        cursor: pointer;
+        color: white;
 
         &:hover {
-            background: #00c8ff;
-            color: black;
-            font-weight: bold;
+            background: $color-button-hover;
         }
     }
 }

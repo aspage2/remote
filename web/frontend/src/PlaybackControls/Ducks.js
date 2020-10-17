@@ -1,6 +1,4 @@
 
-const INITIAL_PLAYBACK = INITIAL_STATUS && INITIAL_STATUS.playback;
-
 const ActionTypes = {
     PB_SET: "action_pb_set",
 };
@@ -11,8 +9,8 @@ export const Actions = {
 };
 
 
-export const reducer = (state, action) => {
+export const makeReducer = initial_playback => (state, action) => {
     if (action.type === ActionTypes.PB_SET)
         return action.playback;
-    return state || INITIAL_PLAYBACK || {}
+    return state || initial_playback || {}
 };

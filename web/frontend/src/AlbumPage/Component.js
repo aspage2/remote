@@ -1,37 +1,43 @@
 import React from 'react';
-import {albumArtUrl, timeStr, useMusicDatabaseQuery} from "../urls";
+import {albumArtUrl, timeStr, useMPDQuery} from "../urls";
 
-import _ from 'lodash';
+import toPairs from "lodash/toPairs";
+import groupBy from "lodash/groupBy";
+import sumBy from "lodash/sumBy";
+import maxBy from "lodash/maxBy";
+import uniqBy from "lodash/uniqBy";
+import map from "lodash/map";
+
 
 import styles from './Style.scss';
-import {SocketContext} from "../socket";
+import {mpdQuery, tracksFromData} from "../mpd";
 
 // mostCommonValue returns the value which makes up the majority of
 // items in a set.
 const mostCommonValue = (l, k) => (
-    _.maxBy(
-        _.toPairs(_.groupBy(l, k)),
+    maxBy(
+        toPairs(groupBy(l, k)),
         ([__, vals]) => vals.length
     )
     || [undefined, undefined]
 )[0];
 
-function AlbumPage({socket, album, albumartist}) {
+export default function AlbumPage({album, albumartist}) {
 
-    const {loaded, err, data} = useMusicDatabaseQuery(`/data/albumartist/${albumartist}/album/${album}`);
+    const {loaded, err, data} = useMPDQuery(`find albumartist "${albumartist}" album "${album}"`);
     if (!loaded)
         return <div/>;
     if (err)
         return <h3>Error</h3>;
 
-    const tracks = data.tracks || [];
+    const tracks = Array.from(tracksFromData(data));
 
     // Indicates that this is a compilation album, changing what information
     // is displayed on the tracklist
-    const multiArtist = _.uniqBy(tracks, "artist").length > 1;
+    const multiArtist = uniqBy(tracks, "artist").length > 1;
 
     // Calculate the duration of this album in hours & minutes
-    const runTime = _.sumBy(tracks, t => parseInt(t.time));
+    const runTime = sumBy(tracks, t => parseInt(t.time));
     const runHours = Math.floor(runTime / 3600);
     const runMinutes = Math.floor((runTime % 3600) / 60);
 
@@ -39,8 +45,10 @@ function AlbumPage({socket, album, albumartist}) {
     const date = mostCommonValue(tracks, "date");
     const genre = mostCommonValue(tracks, "genre");
 
-    const albumAdd = () => socket.emit('findadd', {album, albumartist});
-    const trackAdd = track => socket.emit('findadd', {album, albumartist, track});
+    const albumAdd = () => mpdQuery(`findadd album "${album}" albumartist "${albumartist}"`);
+    const trackAdd = track => mpdQuery(
+        `findadd album "${album}" albumartist "${albumartist}" track ${track}`
+    );
 
     return <React.Fragment>
         <h1>{album}</h1>
@@ -50,10 +58,10 @@ function AlbumPage({socket, album, albumartist}) {
             {runHours && `${runHours} hr ` || ""}
             {runMinutes && `${runMinutes} min` || ""}<br/>
             <i>Genre: {genre}</i><br/><br/>
-            <button onClick={albumAdd}>Add Album to Queue</button>
+            <button className={styles.addAlbum} onClick={albumAdd}>Add Album to Queue</button>
         </div>
 
-        <div className={styles.column}>{_.map(tracks,
+        <div className={styles.column}>{map(tracks,
             (track, i) => <div key={i} className={styles.trackItem}>
                 <span className={styles.trackNum}>{track.track}.</span>
                 <div className={styles.info}>
@@ -66,7 +74,3 @@ function AlbumPage({socket, album, albumartist}) {
         )}</div>
     </React.Fragment>;
 }
-
-export default props => <SocketContext.Consumer>
-    {socket => <AlbumPage socket={socket} {...props}/>}
-</SocketContext.Consumer>;

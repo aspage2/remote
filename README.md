@@ -15,7 +15,6 @@ Directories:
  - `fake_mpd` - resources for a local instance of MPD which runs in docker
  - `web` - python & javascript code for the web service
  - `art` - python code for the album art service
- - `listener` - python code for the mpd-event-listener service
 
 
 ### Running a Dev Server
@@ -38,4 +37,23 @@ Run the full service with docker-compose:
 docker-compose up --force-recreate
 ```
 
-Navigate to `localhost:5000`.
+Navigate to `localhost`.
+
+## Architecture
+
+```mermaid
+graph LR
+	client(Web Client)-->nginx{Nginx}
+	nginx-->art[Album Art Service]
+	nginx-->web[Websocket Proxy]
+	art-->mpd[Music Player Daemon]
+	web-->mpd
+	
+```
+
+### Components
+
+* The **album art service** provides album cover images stored in the music library to web clients.
+* The **websocket proxy** is an adapter to the MPD to allow web clients to interact with it via the [mpd protocol](musicpd.org/doc/html/protocol.html), enabling:
+  * commands & queries
+  * a websocket interface for MPD's `idle` command

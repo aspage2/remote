@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
 
-import {SocketContext} from "../socket";
-
-import _ from 'lodash';
+import isEmpty from "lodash/isEmpty";
+import isNaN from "lodash/isNaN";
+import find from "lodash/find";
 
 import styles from "./Style.scss";
 import {albumArtUrl} from "../urls";
@@ -11,6 +11,7 @@ import PreviousIcon from "../icons/prev.svg"
 import NextIcon from "../icons/next.svg"
 import PlayIcon from "../icons/play.svg"
 import PauseIcon from "../icons/pause.svg"
+import {mpdQuery} from "../mpd";
 
 const buttonIconDim = {
     height: "100",
@@ -50,7 +51,7 @@ const useElapsedTime = (song, state, elapsed, duration) => {
             intervalRef.current = setInterval(routine, 1000);
         } else {
             clearInterval(intervalRef.current);
-            if (_.isEmpty(song)){
+            if (isEmpty(song)){
                 elapsedRef.current = 0;
                 setElapsed(0);
             }
@@ -63,7 +64,7 @@ const useElapsedTime = (song, state, elapsed, duration) => {
 };
 
 function ProgressBar({elapsed, duration}) {
-    if (typeof duration !== "number" || _.isNaN(duration)) {
+    if (typeof duration !== "number" || isNaN(duration)) {
         elapsed = 0.0;
         duration = 1.0;
     }
@@ -72,9 +73,9 @@ function ProgressBar({elapsed, duration}) {
     return <div className={styles.progressBar}><div className={styles.inner} style={{width:`${pct}%`}}/></div>
 }
 
-function PlaybackControls({queue, playback, socket}) {
+export default function PlaybackControls({queue, playback}) {
     const {state, volume, song} = playback;
-    const sendCmd = cmd => socket.emit('playbackCommand', cmd);
+    const sendCmd = cmd => mpdQuery(cmd);
 
     const elapsed = parseFloat(playback.elapsed);
     const duration = parseFloat(playback.duration);
@@ -90,13 +91,11 @@ function PlaybackControls({queue, playback, socket}) {
         msgIcon = <PlayIcon {...buttonIconDim}/>;
     }
     const {album, title, artist, albumartist} = (
-        !_.isEmpty(song) && _.find(queue || [], ({pos}) => String(pos) === String(song))
+        !isEmpty(song) && find(queue || [], ({pos}) => String(pos) === String(song))
     );
 
     return <div className={styles.root}>
         <div className={styles['now-playing']}>
-            {!_.isEmpty(album) ? <img alt={album} src={albumArtUrl({album, albumartist})}/> :
-                <div className={styles["no-album-art"]}/>}
             <div className={styles["song-info"]}>
                 <h3>{title || "Nothing Playing"}</h3>
                 {album && <p><b>{album}</b> - {artist}</p>}
@@ -121,8 +120,3 @@ function PlaybackControls({queue, playback, socket}) {
         </div>
     </div>
 }
-
-export default props => <SocketContext.Consumer>{
-    socket => <PlaybackControls socket={socket} {...props}/>
-}</SocketContext.Consumer>
-

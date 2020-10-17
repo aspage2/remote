@@ -1,7 +1,4 @@
 import React from "react";
-import classNames from "classnames";
-
-import _ from "lodash";
 
 import AddIcon from "../icons/add.svg"
 
@@ -15,23 +12,22 @@ export default function AlbumCard(props){
     const {info:{album, albumartist, date}, buttonClick} = props;
     const src = albumArtUrl({album, albumartist});
 
-    const info_class = classNames({
-        [styles['info-panel']]: true,
-        [styles['normally-hidden']]: !err && props.hideDetails
-    });
 
-    return <div className={`${styles['image-medium']} ${styles.root} floating`}>
+    return <div className={` ${styles.root}`} onClick={props.onClick}>
         <img
-            src={err ? `http://${ALBUM_ART_URL}/notfound.jpg` : src}
+            src={err ? `/static/notfound.png` : src}
             alt={album}
+            className={styles['image-medium']}
             onError={() => setErr(true)}
         />
-        <div className={info_class} onClick={_.partial(props.onClick, album, albumartist)}>
-            <h3>{album}</h3>
-            <p className={styles.infoPanel}>{albumartist}</p>
-            {date && <p>{date}</p>}
+        <div className={styles["info-panel"]}>
+            <span className={styles.album}>{album}</span>{date && ` - ${date}`}<br/>
+            {albumartist}
         </div>
-        {buttonClick && <button className={styles["add-button"]} onClick={buttonClick}>
+        {buttonClick && <button className={styles["add-button"]} onClick={ev => {
+            ev.stopPropagation();
+            buttonClick(ev);
+        }}>
             <AddIcon width="30" height="30"/>
         </button>}
     </div>
