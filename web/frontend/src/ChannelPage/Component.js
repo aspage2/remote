@@ -1,5 +1,7 @@
 import React from 'react';
 
+import axios from "axios";
+
 import {SocketContext} from "../socket";
 import _ from "lodash"
 
@@ -10,12 +12,26 @@ import ToggleButton from "../ToggleButton";
 
 function ChannelPage(props) {
 
-    const {socket, channels} = props;
+    const {channels, putChannels, putSnackbarMessage} = props;
+    const currChannels = channels.active;
 
-    const currChannels = channels.status;
-
-    const setChannel = chan => socket.emit('channel', chan, () => {
-    });
+    const setChannel = chan => {
+        axios.post("/gpio/channels", {
+            "channel_id": chan,
+            "action": "toggle",
+        }).then(res => {
+            putChannels(res.data);
+        }).catch(reason => {
+            putSnackbarMessage(`Error: ${reason.response.data.detail}`);
+        });
+    }
+    const sysOff = () => {
+        axios.post("/gpio/channels", {
+            "action": "sys_off"
+        }).then(res => {
+            putChannels(res.data);
+        });
+    }
     return <React.Fragment>
         <h1>Audio Channels</h1>
         <p>Press the status button to turn all channels off</p>
@@ -24,9 +40,9 @@ function ChannelPage(props) {
                 className={classnames(
                     styles.off,
                     {[styles.active]: currChannels.length === 0}
-                )} onClick={() => setChannel("off")}>STATUS: {currChannels.length === 0 ? "OFF" : "ON"}</button>
+                )} onClick={sysOff}>STATUS: {currChannels.length === 0 ? "OFF" : "ON"}</button>
             {
-                _.map(channels.pinout, (channel, i) =>
+                _.map(channels.channels, (channel, i) =>
                     <div key={i}>
                         <ToggleButton
                             text={channel.desc}

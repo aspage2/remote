@@ -1,4 +1,9 @@
-FROM vimagick/mpd:latest
+FROM debian:buster-slim
 
-COPY mpd.conf /etc/mpd.conf
+RUN apt-get update && apt-get install -y mpd mpc
 
+RUN mkdir -p /var/lib/mpd /run/mpd
+
+
+EXPOSE 6600
+ENTRYPOINT ["mpd", "--stdout", "--no-daemon"]

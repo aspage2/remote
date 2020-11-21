@@ -5,6 +5,9 @@ fake_mpd/database/
 fake_mpd/music/add_your_music_here
 fake_mpd/playlists/
 fake_mpd/store/
+fake_mpd/state
+fake_mpd/sticker.sql
+fake_mpd/tag_cache
 
 .idea/
 .vscode/

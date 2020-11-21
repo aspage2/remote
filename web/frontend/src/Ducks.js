@@ -11,7 +11,7 @@ const reducer = init => combineReducers({
     snackbar: SnackbarReducer,
     queue: QueueReducer(init.queue),
     playback: PlaybackReducer(init.playback),
-    channel: ChannelReducer([]),
+    channel: ChannelReducer(init.channels),
 });
 
 export default reducer;
