@@ -102,7 +102,7 @@ const CHANNEL_UPDATE_TYPES = [
     "gpiochannel",
 ]
 
-export function startMpdWatcher(setStatus, setQueue) {
+export function startMpdWatcher(setStatus, setQueue, onDBUpdate) {
     const ws = new WebSocket(`ws://${location.host}/ws/mpd/idle`);
 
     ws.onmessage = function(ev) {
@@ -128,6 +128,9 @@ export function startMpdWatcher(setStatus, setQueue) {
         }
         if (updateQueue) {
             pullQueueInfo().then(setQueue);
+        }
+        if (updateDB) {
+            onDBUpdate()
         }
     }
 }

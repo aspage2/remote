@@ -47,6 +47,9 @@ class GPIOController:
             {"name": pin.id, "desc": pin.display_name} for pin in self._config.channels
         ]
 
+    def __contains__(self, channel_id):
+        return any(c.id == channel_id for c in self._config.channels)
+
     def set_channel(self, pin_name):
         # Already on
         if self._state[pin_name]:

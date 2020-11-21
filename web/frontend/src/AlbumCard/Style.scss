@@ -35,36 +35,8 @@
 }
 
 .root:hover {
-    .add-button {
-        display: inline-block;
-    }
     .album {
         text-decoration: underline;
-    }
-}
-
-.add-button {
-    display: none;
-    border: none;
-    background: #003242;
-    border-radius: 3px;
-    cursor: pointer;
-    padding: 5px;
-    position: absolute;
-    margin: 5px;
-    top: 0;
-    right: 0;
-
-    > svg * {
-        fill: white;
-    }
-
-    &:hover {
-        background: #00c8ff;
-    }
-
-    &:hover > svg * {
-        fill: black;
     }
 }
 

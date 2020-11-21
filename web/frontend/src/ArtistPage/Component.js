@@ -28,9 +28,6 @@ export default function ArtistPage(props){
                 info={album}
                 hideDetails={!show}
                 onClick={() => history.push(`/web/albumartist/${album.albumartist}/album/${album.album}`)}
-                buttonClick={() => {
-                    mpdQuery(`findadd album "${album.album}" albumartist "${album.albumartist}"`);
-                }}
             />)}
         </div>
     </React.Fragment>

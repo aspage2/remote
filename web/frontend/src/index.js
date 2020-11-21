@@ -7,10 +7,11 @@ import App from "./App";
 import ReactDOM from 'react-dom';
 import {Provider as StoreProvider} from "react-redux";
 import reducer from "./Ducks";
-import {Actions as PlaybackActions} from "./PlaybackControls"
+import {Actions as PlaybackActions} from "./PlaybackControls";
 import {Actions as QueueActions} from "./Queue";
-import {BrowserRouter} from "react-router-dom";
 
+import axios from "axios";
+import {Actions as SnackbarActions} from "./Snackbar";
 
 const root = document.getElementById("root");
 
@@ -23,6 +24,9 @@ Promise.all([
     pullQueueInfo().then(res => {
         initial.queue = res
     }),
+    axios.get("/gpio/channels").then(res => {
+        initial.channels = res.data;
+    }),
 ]).then(
     () => {
         const store = createStore(reducer(initial));
@@ -33,6 +37,9 @@ Promise.all([
             queue => {
                 store.dispatch(QueueActions.setQueue(queue))
             },
+            () => {
+                store.dispatch(SnackbarActions.showSnackbar("A database update started."))
+            }
         );
         ReactDOM.render(
             <StoreProvider store={store}>

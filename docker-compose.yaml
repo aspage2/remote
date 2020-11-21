@@ -3,6 +3,7 @@ services:
   mpd:
     build: fake_mpd/
     volumes:
+      - ./fake_mpd/mpd.conf:/etc/mpd.conf
       - ./fake_mpd/music:/var/lib/mpd/music
       - ./fake_mpd/playlists:/var/lib/mpd/playlists
     ports:

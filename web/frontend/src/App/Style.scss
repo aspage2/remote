@@ -52,3 +52,12 @@ div.nav, #browser-root {
   so content isn't covered by the playback bar */
   padding: 10px 10px 100px $nav-bar-width + 20px;
 }
+
+.fatal-error {
+  text-align: center;
+  margin-top: 100px;
+
+  > button {
+    font-size: 1.4rem;
+  }
+}
