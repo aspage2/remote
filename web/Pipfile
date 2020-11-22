@@ -8,7 +8,7 @@ pyyaml = "*"
 "rpi.gpio" = "*"
 jsonschema = "*"
 fastapi = "*"
-uvicorn = "*"
+"uvicorn[standard]" = "*"
 
 [dev-packages]
 pytest = "*"
@@ -18,4 +18,4 @@ pytest-cov = "*"
 flake8 = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.7"

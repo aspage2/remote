@@ -1,7 +1,7 @@
 
 @import "../Vars";
 
-.mainInput {
+.searchForm > * {
     font-size: 30px;
     background: $color-list-item;
     border: 2px solid $color-bg-nav;
@@ -9,8 +9,13 @@
     padding: 10px;
     outline:none;
     color: $color-text-dark;
-    &::placeholder {
-        color: #d0d0d0;
+    &.mainInput {
+        &::placeholder {
+            color: #d0d0d0;
+        }
+    }
+    &.mainSubmit {
+        font-weight: bold;
     }
 }
 
@@ -21,9 +26,7 @@
     margin-right: 10px;
 }
 
-
 .item {
-
     background-color: $color-list-item;
     cursor:pointer;
     margin: 5px;

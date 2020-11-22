@@ -1,0 +1,28 @@
+
+.divider {
+  margin: 10px 0;
+  width: 500px;
+  height: 2px;
+  background: #505050;
+}
+
+.consoleInput, .mpdResults{
+  padding: 5px;
+  background: #0e0e0e;
+  color: white;
+  font-family: monospace;
+  border: none;
+  font-size: 18px;
+}
+
+.mpdResults {
+  background: #0e0e0e;
+  min-height: 100px;
+  width: 100%;
+}
+
+.monospace {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 20px;
+}

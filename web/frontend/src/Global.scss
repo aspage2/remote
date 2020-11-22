@@ -1,0 +1,17 @@
+
+@import "Vars.scss";
+
+a {
+  text-decoration: none;
+  color: $color-text-dark;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.divider {
+  height: 2px;
+  margin: 10px 0;
+  background: #505050;
+  width: 100%;
+}

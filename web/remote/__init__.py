@@ -1,11 +1,12 @@
 import asyncio
 import json
 import os
-from fastapi import FastAPI, WebSocket, Request, HTTPException
+
+from fastapi import FastAPI, HTTPException, Request, WebSocket
 from starlette.endpoints import WebSocketEndpoint
 
 from remote.gpio.controller import GPIOController, GPIOException
-from remote.mpd import COMMAND_BLACKLIST, read_mpd_response, open_mpd
+from remote.mpd import COMMAND_BLACKLIST, open_mpd, read_mpd_response
 from remote.util import get_gpio
 
 MPD_HOST = os.environ.get("MPD_HOST", "localhost")
@@ -64,7 +65,8 @@ async def mpd_command(websocket: WebSocket):
 
     try:
         query = (await websocket.receive_text()).strip()
-        if (cmd := query.split(" ", 1)[0]) in COMMAND_BLACKLIST:
+        cmd = query.split(" ", 1)[0]
+        if query.split(" ", 1)[0] in COMMAND_BLACKLIST:
             resp = f"ACK: blacklisted: {cmd}"
         else:
             writer.write(f"{query.strip()}\n".encode())
@@ -102,7 +104,7 @@ class IdleEndpoint(WebSocketEndpoint):
                     if line != b"OK"
                 ]
                 await ws.send_text(json.dumps(changed))
-        except Exception as e:
+        except Exception:
             pass
         finally:
             writer.close()

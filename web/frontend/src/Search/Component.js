@@ -79,7 +79,7 @@ export function Search({history}) {
     const {loaded, err, results} = useSearchQuery(searchQuery);
 
     return <React.Fragment>
-        <form onSubmit={e => {
+        <form className={styles.searchForm} onSubmit={e => {
             e.preventDefault();
             setSearchQuery(inputRef.current.value)
         }}><input
@@ -88,7 +88,7 @@ export function Search({history}) {
             className={styles.mainInput}
             type="text"
             ref={inputRef}
-        /><input type="submit" style={{display: "none"}}/></form>
+        /><input type="submit" value="Go" className={styles.mainSubmit}/></form>
         <br/>
         {loaded && results && <div>
             <div className={styles.column}>

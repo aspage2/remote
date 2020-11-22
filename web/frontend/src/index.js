@@ -13,6 +13,8 @@ import {Actions as QueueActions} from "./Queue";
 import axios from "axios";
 import {Actions as SnackbarActions} from "./Snackbar";
 
+import "./Global.scss";
+
 const root = document.getElementById("root");
 
 let initial = {};

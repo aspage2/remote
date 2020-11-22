@@ -4,6 +4,7 @@ import classNames from "classnames";
 import styles from "./Styles.scss"
 import {SocketContext} from "../socket";
 import {mpdQuery, objFromData} from "../mpd";
+import {Link} from "react-router-dom";
 
 
 const SiteStats = stats => {
@@ -62,13 +63,14 @@ function StatusPage(props) {
 
     return <React.Fragment>
         <h1>Status, Stats, Settings</h1>
+        <Link to={"/web/console"}>MPD Console</Link>
         <div>
             <div className={classNames(styles.dbUpdate, {[styles.active]: updating})}>
                 Database Update: {updating ? "ON" : "OFF"}
             </div>
         </div>
-        <button onClick={()=>{mpdQuery("update");}}>
-            Start Update
+        <button onClick={()=>{mpdQuery("update")}} disabled={updating}>
+            Start an Update
         </button>
 
         <SiteStats {...stats}/>

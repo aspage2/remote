@@ -29,16 +29,9 @@ div.nav {
   left: 0;
   a {
     padding: 10px;
-    text-decoration: none;
     display: block;
-    color: $color-text-dark;
     font-weight: bold;
     font-size: 1.3rem;
-    border-radius: 3px;
-
-    &:hover {
-      text-decoration: underline;
-    }
   }
 }
 

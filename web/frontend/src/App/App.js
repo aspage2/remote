@@ -4,7 +4,6 @@ import styles from "./Style.scss";
 
 import Search from '../Search'
 import {Route, Redirect, Switch, Link, BrowserRouter} from "react-router-dom";
-import "./App.css";
 import PlaybackControls from "../PlaybackControls";
 import Snackbar from "../Snackbar";
 import AlbumPage from "../AlbumPage";
@@ -14,6 +13,7 @@ import Queue from "../Queue";
 import Browse from "../Browse/Browse";
 import StatsPage from "../StatusPage";
 import CurrentAlbum from "../CurrentAlbum";
+import MPDConsole from "../MPDConsole/Component";
 
 
 export default function App(props) {
@@ -41,6 +41,7 @@ export default function App(props) {
                     }/>
                     <Route path="/web/queue" component={Queue}/>
                     <Route path="/web/stats" component={StatsPage}/>
+                    <Route path="/web/console" component={MPDConsole}/>
                 </Switch>
             </div>
             <PlaybackControls/>

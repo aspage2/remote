@@ -6,13 +6,10 @@ COMMAND_BLACKLIST = {
     # listall & listallinfo will dump entire library into the socket
     "listall",
     "listallinfo",
-
     # Use the /art/ interface
     "albumart",
-
     # Clients should not have this kind of power
     "kill",
-
     # Clients don't need to see config
     "config",
 }
