@@ -7,11 +7,8 @@ import App from "./App";
 import ReactDOM from 'react-dom';
 import {Provider as StoreProvider} from "react-redux";
 import reducer from "./Ducks";
-import {Actions as PlaybackActions} from "./PlaybackControls";
-import {Actions as QueueActions} from "./Queue";
 
 import axios from "axios";
-import {Actions as SnackbarActions} from "./Snackbar";
 
 import "./Global.scss";
 
@@ -32,17 +29,7 @@ Promise.all([
 ]).then(
     () => {
         const store = createStore(reducer(initial));
-        startMpdWatcher(
-            status => {
-                store.dispatch(PlaybackActions.setPlayback(status))
-            },
-            queue => {
-                store.dispatch(QueueActions.setQueue(queue))
-            },
-            () => {
-                store.dispatch(SnackbarActions.showSnackbar("A database update started."))
-            }
-        );
+        startMpdWatcher(store.dispatch);
         ReactDOM.render(
             <StoreProvider store={store}>
                 <App/>
@@ -50,7 +37,10 @@ Promise.all([
             , root);
     }
 ).catch(err => {
-    ReactDOM.render(<><h1>Congrats, it's broken.</h1><p>Error: {JSON.stringify(err)}</p></>, root)
+    ReactDOM.render(<>
+        <h1>Congrats, it's broken.</h1>
+        <p>Error: {JSON.stringify(err)}</p>
+    </>, root)
 })
 
 

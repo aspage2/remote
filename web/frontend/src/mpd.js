@@ -2,6 +2,11 @@
  * Utilities issuing MPD commands/queries via `/ws/mpd/command`
  */
 
+import {Actions as PlaybackActions} from "./PlaybackControls";
+import {Actions as QueueActions} from "./Queue";
+import {Actions as SnackbarActions} from "./Snackbar";
+import {Actions as GlobalActions} from "./Ducks";
+
 export function mpdQuery(command) {
     const ws = new WebSocket(`ws://${location.host}/ws/mpd/command`);
     return new Promise((resolve, reject) => {
@@ -102,35 +107,47 @@ const CHANNEL_UPDATE_TYPES = [
     "gpiochannel",
 ]
 
-export function startMpdWatcher(setStatus, setQueue, onDBUpdate) {
-    const ws = new WebSocket(`ws://${location.host}/ws/mpd/idle`);
+export function startMpdWatcher(dispatch) {
 
-    ws.onmessage = function(ev) {
-        const changedList = JSON.parse(ev.data);
-        let updateStatus = false, updateQueue = false, updateDB = false, updateChannels = false;
+    const run = res => {
+        const ws = new WebSocket(`ws://${location.host}/ws/mpd/idle`);
+        ws.onopen = () => dispatch(GlobalActions.setConnection(true));
+        ws.onmessage = function(ev) {
+            const changedList = JSON.parse(ev.data);
+            let updateStatus = false, updateQueue = false, updateDB = false, updateChannels = false;
 
-        for (const changed of changedList) {
-            if (STATUS_UPDATE_TYPES.includes(changed)) {
-                updateStatus = true;
+            for (const changed of changedList) {
+                if (STATUS_UPDATE_TYPES.includes(changed)) {
+                    updateStatus = true;
+                }
+                if (PLAYLIST_UPDATE_TYPES.includes(changed)) {
+                    updateQueue = true;
+                }
+                if (DB_UPDATE_TYPES.includes(changed)) {
+                    updateDB = true;
+                }
+                if (CHANNEL_UPDATE_TYPES.includes(changed)) {
+                    updateChannels = true;
+                }
             }
-            if (PLAYLIST_UPDATE_TYPES.includes(changed)) {
-                updateQueue = true;
+            if (updateStatus) {
+                pullPlaybackInfo().then(pb => dispatch(PlaybackActions.setPlayback(pb)));
             }
-            if (DB_UPDATE_TYPES.includes(changed)) {
-                updateDB = true;
+            if (updateQueue) {
+                pullQueueInfo().then(q => dispatch(QueueActions.setQueue(q)));
             }
-            if (CHANNEL_UPDATE_TYPES.includes(changed)) {
-                updateChannels = true;
+            if (updateDB) {
+                dispatch(SnackbarActions.showSnackbar("database update"));
             }
         }
-        if (updateStatus) {
-            pullPlaybackInfo().then(setStatus);
-        }
-        if (updateQueue) {
-            pullQueueInfo().then(setQueue);
-        }
-        if (updateDB) {
-            onDBUpdate()
-        }
+        ws.onclose = res;
+        ws.onerror = res;
     }
+    return new Promise(async () => {
+        while (true) {
+            await new Promise(run);
+            dispatch(GlobalActions.setConnection(false));
+            await new Promise(res => setTimeout(res, 1000));
+        }
+    })
 }

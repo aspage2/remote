@@ -1,6 +1,13 @@
 
 @import "../Vars";
 
+.noConnection {
+  padding: 3px;
+  background: lightpink;
+  color: darkred;
+  font-weight: bold;
+}
+
 .currentAlbum {
   max-width: $nav-bar-width;
   max-height: $nav-bar-width;
