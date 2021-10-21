@@ -37,6 +37,7 @@ function useSearchQuery(searchTerm) {
         results: undefined,
     })
     useEffect(() => {
+        setLoadState({loaded: false, err: false, results: undefined});
         if (searchTerm.length === 0) return;
         const artist = new Promise((res, rej) => {
             mpdQuery(`search artist "${searchTerm}"`).then(data => {
@@ -72,16 +73,22 @@ function useSearchQuery(searchTerm) {
     return loadState
 }
 
+export function Search({history, location}) {
+    const q = new URLSearchParams(location.search);
+    const loadedSearchTerm = q.get("q") || "";
 
-export function Search({history}) {
-    const inputRef = useRef("");
-    const [searchQuery, setSearchQuery] = useState("");
+    const inputRef = useRef(loadedSearchTerm);
+    const [searchQuery, setSearchQuery] = useState(loadedSearchTerm);
     const {loaded, err, results} = useSearchQuery(searchQuery);
 
     return <React.Fragment>
         <form className={styles.searchForm} onSubmit={e => {
             e.preventDefault();
-            setSearchQuery(inputRef.current.value)
+            const q = inputRef.current.value;
+            setSearchQuery(q);
+            history.replace({
+                search: `?q=${encodeURIComponent(q)}`
+            });
         }}><input
             placeholder="Search..."
             size={42}
@@ -91,6 +98,7 @@ export function Search({history}) {
         /><input type="submit" value="Go" className={styles.mainSubmit}/></form>
         <br/>
         {loaded && results && <div>
+            <h2>Results for "{searchQuery}"</h2>
             <div className={styles.column}>
                 <h3>Artists</h3>{
                 _.map(results.artist, ({artist}, i) => <div
