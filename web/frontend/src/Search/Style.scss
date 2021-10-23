@@ -2,20 +2,29 @@
 @import "../Vars";
 
 .searchForm > * {
-    font-size: 30px;
+    font-size: 20px;
     background: $color-list-item;
     border: 2px solid $color-bg-nav;
     border-radius: 5px;
-    padding: 10px;
     outline:none;
     color: $color-text-dark;
     &.mainInput {
+        padding: 10px;
         &::placeholder {
             color: #d0d0d0;
         }
     }
     &.mainSubmit {
+        margin-left: 5px;
+        padding: 5px 8px;
         font-weight: bold;
+    }
+}
+
+@media only screen and (max-width: $mobile-width-limit) {
+    .searchForm > * {
+        font-size: 18px;
+        padding: 5px;
     }
 }
 

@@ -1,0 +1,20 @@
+@import "../Vars";
+
+.root {
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+
+  &:hover {
+    background: $color-button;
+  }
+  > .drawer-bar {
+    height: 4px;
+    &:not(:first-child) {
+      margin-top: 8px;
+    }
+    background: $color-text-dark;
+  }
+}
+

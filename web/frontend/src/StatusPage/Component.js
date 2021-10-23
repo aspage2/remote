@@ -2,6 +2,7 @@ import React from 'react';
 import {useMPDQuery, englishTimeStr} from "../urls";
 import classNames from "classnames";
 import styles from "./Styles.scss"
+import globalStyles from "../Global.scss";
 import {SocketContext} from "../socket";
 import {mpdQuery, objFromData} from "../mpd";
 import {Link} from "react-router-dom";
@@ -32,8 +33,7 @@ const SiteStats = stats => {
             <u>Sum of Song Times</u>:{'\u00A0'}
             {englishTimeStr(parseInt(stats.db_playtime))}</b>
         </span>
-
-        <h2>System</h2>
+        <div className={globalStyles.divider}/>
         <table>
             <tbody>
             <tr>
@@ -62,16 +62,18 @@ function StatusPage(props) {
     const updating = props.isUpdating;
 
     return <React.Fragment>
-        <h1>Status, Stats, Settings</h1>
+        <h1>System</h1>
         <Link to={"/web/console"}>MPD Console</Link>
         <div>
             <div className={classNames(styles.dbUpdate, {[styles.active]: updating})}>
                 Database Update: {updating ? "ON" : "OFF"}
             </div>
         </div>
-        <button onClick={()=>{mpdQuery("update")}} disabled={updating}>
+        <button onClick={()=>mpdQuery("update")} disabled={updating}>
             Start an Update
         </button>
+
+        <div className={globalStyles.divider}/>
 
         <SiteStats {...stats}/>
     </React.Fragment>

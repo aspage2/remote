@@ -5,20 +5,38 @@
     position: fixed;
     bottom: 0;
     width: 100vw;
-    height: $status-bar-height;
-    background: $color-playback-bar;
-    padding-left: $nav-bar-width + 10px;
+    z-index: 9;
+    text-align: center;
+}
 
-    > * {
+.card {
+    text-align: left;
+    height: $status-bar-height+5px;
+    background: $color-playback-bar+5px;
+    display: inline-block;
+    margin: 10px;
+
+    > *:not(:first-child) {
         display: inline-block;
+        vertical-align: middle;
     }
+
+    > .last-child {
+        margin-right:15px;
+    }
+}
+
+.current-album {
+    max-height: $status-bar-height;
+    max-width: $status-bar-height;
 }
 
 .song-info {
     box-sizing: border-box;
-    display: inline-block;
+    display: none;
     padding: 0 15px 0 10px;
-    width: 400px;
+    width: 300px;
+    text-align: left;
 
     > * {
         white-space: nowrap;
@@ -50,20 +68,22 @@
 
     button {
         background: none;
-        border: none;
         vertical-align: middle;
         padding: 0 10px;
+    }
+}
 
-        svg {
-            fill: white;
-        }
+@media only screen and (min-width: $mobile-width-limit) {
+    .card {
+        height: $status-bar-height-desktop + 5px;
+    }
 
-        &:hover {
-            background: white;
+    .current-album {
+        max-height: $status-bar-height-desktop;
+        max-width: $status-bar-height-desktop;
+    }
 
-            svg {
-                fill: #25274d;
-            }
-        }
+    .song-info {
+        display: inline-block;
     }
 }

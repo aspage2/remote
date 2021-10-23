@@ -1,6 +1,29 @@
 
 @import "Vars.scss";
 
+button {
+  border-radius: 5px;
+  border: none;
+  padding: 5px 8px;
+  font-weight: bold;
+  color: $color-text-dark;
+  background: $color-button;
+
+  svg {
+    fill: $color-text-dark;
+  }
+
+  &:hover {
+    background: $color-text-dark;
+    color: $color-button;
+
+    svg {
+      fill: $color-button
+    }
+  }
+}
+
+
 a {
   text-decoration: none;
   color: $color-text-dark;

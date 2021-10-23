@@ -91,7 +91,7 @@ export function Search({history, location}) {
             });
         }}><input
             placeholder="Search..."
-            size={42}
+            size={30}
             className={styles.mainInput}
             type="text"
             ref={inputRef}

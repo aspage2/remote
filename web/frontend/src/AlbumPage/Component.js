@@ -22,7 +22,7 @@ const mostCommonValue = (l, k) => (
     || [undefined, undefined]
 )[0];
 
-export default function AlbumPage({album, albumartist}) {
+export default function AlbumPage({album, albumartist, showMessage}) {
 
     const {loaded, err, data} = useMPDQuery(`find albumartist "${albumartist}" album "${album}"`);
     if (!loaded)
@@ -45,10 +45,11 @@ export default function AlbumPage({album, albumartist}) {
     const date = mostCommonValue(tracks, "date");
     const genre = mostCommonValue(tracks, "genre");
 
-    const albumAdd = () => mpdQuery(`findadd album "${album}" albumartist "${albumartist}"`);
+    const albumAdd = () => mpdQuery(`findadd album "${album}" albumartist "${albumartist}"`)
+        .then(() => showMessage("Album added"));
     const trackAdd = track => mpdQuery(
         `findadd album "${album}" albumartist "${albumartist}" track ${track}`
-    );
+    ).then(() => showMessage("Track added"));
 
     return <React.Fragment>
         <h1>{album}</h1>
