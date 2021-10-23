@@ -17,6 +17,22 @@
   left:0;
 }
 
+.nav-button-div {
+  display: block;
+  text-align: left;
+  padding-left: 10px;
+}
+
+div.volume {
+  display:inline-block;
+  margin: 10px;
+  vertical-align: middle;
+
+  > button {
+    margin: 0 5px;
+  }
+}
+
 body {
   margin: 0;
   font-family: sans-serif;
@@ -31,9 +47,6 @@ div.nav {
   text-align: center;
   padding: 8px;
   box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
   a {
     padding: 10px;
     display: block;
@@ -42,16 +55,59 @@ div.nav {
   }
 }
 
-div.nav, #browser-root {
-  display:inline-block;
-  vertical-align: top;
+.root-nav-button {
+  font-weight: bold;
+  > * {
+    margin-right: 10px;
+    vertical-align: middle;
+    display: inline-block;
+    font-size: 1.5rem;
+  }
 }
 
 #browser-root {
   /* Add padding-bottom to the browse window
   so content isn't covered by the playback bar */
-  padding: 10px 10px 100px $nav-bar-width + 20px;
+  padding: 10px 10px 150px $nav-bar-width + 20px;
 }
+
+.root-nav {
+  height: 100vh;
+  width: $nav-bar-width;
+  background: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  display: none;
+
+  &.open {
+    display: block;
+  }
+}
+
+div.nav, #browser-root {
+  display: inline-block;
+  vertical-align: top;
+  position: absolute;
+}
+
+@media only screen and (max-width: $mobile-width-limit) {
+  .root-nav {
+    width: 100vw;
+  }
+  .root-nav.open {
+    display: block;
+  }
+
+  #browser-root {
+    padding-left: 20px
+  }
+}
+
+#app-root {
+  width: 100vw;
+  height: 100vh;
+  display: inline-block;
+}
+
 
 .fatal-error {
   text-align: center;

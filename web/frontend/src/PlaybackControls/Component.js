@@ -5,8 +5,8 @@ import isNaN from "lodash/isNaN";
 import find from "lodash/find";
 
 import styles from "./Style.scss";
-import {albumArtUrl} from "../urls";
 
+import CurrentAlbum from "../CurrentAlbum";
 import PreviousIcon from "../icons/prev.svg"
 import NextIcon from "../icons/next.svg"
 import PlayIcon from "../icons/play.svg"
@@ -14,7 +14,7 @@ import PauseIcon from "../icons/pause.svg"
 import {mpdQuery} from "../mpd";
 
 const buttonIconDim = {
-    height: "100",
+    height: "70",
     width: "55",
 };
 
@@ -51,7 +51,7 @@ const useElapsedTime = (song, state, elapsed, duration) => {
             intervalRef.current = setInterval(routine, 1000);
         } else {
             clearInterval(intervalRef.current);
-            if (isEmpty(song)){
+            if (isEmpty(song)) {
                 elapsedRef.current = 0;
                 setElapsed(0);
             }
@@ -68,13 +68,15 @@ function ProgressBar({elapsed, duration}) {
         elapsed = 0.0;
         duration = 1.0;
     }
-    const pct = parseInt(100*elapsed / duration);
+    const pct = parseInt(100 * elapsed / duration);
 
-    return <div className={styles.progressBar}><div className={styles.inner} style={{width:`${pct}%`}}/></div>
+    return <div className={styles.progressBar}>
+        <div className={styles.inner} style={{width: `${pct}%`}}/>
+    </div>
 }
 
 export default function PlaybackControls({queue, playback}) {
-    const {state, volume, song} = playback;
+    const {state, song} = playback;
     const sendCmd = cmd => mpdQuery(cmd);
 
     const elapsed = parseFloat(playback.elapsed);
@@ -95,28 +97,27 @@ export default function PlaybackControls({queue, playback}) {
     );
 
     return <div className={styles.root}>
-        <div className={styles['now-playing']}>
-            <div className={styles["song-info"]}>
-                <h3>{title || "Nothing Playing"}</h3>
-                {album && <p><b>{album}</b> - {artist}</p>}
-                <ProgressBar duration={duration} elapsed={estElapsed}/>
+        <div className={styles.card}>
+            <ProgressBar duration={duration} elapsed={estElapsed}/>
+            <CurrentAlbum cls={styles["current-album"]}/>
+            <div className={styles['now-playing']}>
+                <div className={styles["song-info"]}>
+                    <h3>{title || "Nothing Playing"}</h3>
+                    {album && <p><b>{album}</b> - {artist}</p>}
+                </div>
             </div>
-        </div>
-        <div className={styles["playback-buttons"]}>
-            <button onClick={() => sendCmd('previous')}>
-                <PreviousIcon {...buttonIconDim}/>
-            </button>
-            <button onClick={() => sendCmd(msg.toLowerCase())}>
-                {msgIcon}
-            </button>
-            <button onClick={() => sendCmd('next')}>
-                <NextIcon {...buttonIconDim}/>
-            </button>
-        </div>
-        <div>
-            <button onClick={() => sendCmd("volume -2")}>Vol -</button>
-            <span>{volume}</span>
-            <button onClick={() => sendCmd("volume +2")}>Vol +</button>
+            <div className={styles["playback-buttons"]}>
+                <button onClick={() => sendCmd('previous')}>
+                    <PreviousIcon {...buttonIconDim}/>
+                </button>
+                <button onClick={() => sendCmd(msg.toLowerCase())}>
+                    {msgIcon}
+                </button>
+                <button onClick={() => sendCmd('next')}>
+                    <NextIcon {...buttonIconDim}/>
+                </button>
+            </div>
+            <div className={styles["last-child"]}/>
         </div>
     </div>
 }

@@ -1,0 +1,15 @@
+
+@import "../Vars";
+
+.err {
+  width: $status-bar-height;
+  height: $status-bar-height;
+  background: #2f2f2f;
+}
+
+@media only screen and (min-width: $mobile-width-limit) {
+  .err {
+    width: $status-bar-height-desktop;
+    height: $status-bar-height-desktop;
+  }
+}

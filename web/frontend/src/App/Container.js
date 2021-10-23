@@ -7,6 +7,7 @@ import _ from "lodash";
 const mapStateToProps = state => ({
     queueCount: state.queue.length,
     dbUpdating: !(_.isUndefined(state.playback.updating_db) || _.isNull(state.playback.updating_db)),
+    volume: state.playback.volume,
     isConnected: state.connected,
 });
 
