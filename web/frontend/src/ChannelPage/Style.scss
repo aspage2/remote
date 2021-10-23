@@ -1,25 +1,25 @@
 .channelList {
-    width: 156px;
-    text-align: center;
-    button {
-        border-radius: 5px;
-        height: 36px;
-        margin: 3px;
-        color: black;
+  width: 156px;
+  text-align: center;
+  button {
+    border-radius: 5px;
+    height: 36px;
+    margin: 3px;
+    color: black;
+  }
+
+  .off {
+    width: 106px;
+    border: none;
+    background: #009104;
+
+    &:hover {
+      background: #006304;
     }
 
-    .off {
-        width: 106px;
-        border: none;
-        background: #009104;
-
-        &:hover {
-            background: #006304;
-        }
-
-        &.active {
-            background: #2b2b2b;
-            color: white;
-        }
+    &.active {
+      background: #2b2b2b;
+      color: white;
     }
+  }
 }

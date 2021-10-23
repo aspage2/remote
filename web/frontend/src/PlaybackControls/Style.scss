@@ -1,89 +1,88 @@
-
 @import "../Vars";
 
 .root {
-    position: fixed;
-    bottom: 0;
-    width: 100vw;
-    z-index: 9;
-    text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  z-index: 9;
+  text-align: center;
 }
 
 .card {
-    text-align: left;
-    height: $status-bar-height+5px;
-    background: $color-playback-bar+5px;
+  text-align: left;
+  height: $status-bar-height + 5px;
+  background: $color-playback-bar + 5px;
+  display: inline-block;
+  margin: 10px;
+
+  > *:not(:first-child) {
     display: inline-block;
-    margin: 10px;
+    vertical-align: middle;
+  }
 
-    > *:not(:first-child) {
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    > .last-child {
-        margin-right:15px;
-    }
+  > .last-child {
+    margin-right: 15px;
+  }
 }
 
 .current-album {
-    max-height: $status-bar-height;
-    max-width: $status-bar-height;
+  max-height: $status-bar-height;
+  max-width: $status-bar-height;
 }
 
 .song-info {
-    box-sizing: border-box;
-    display: none;
-    padding: 0 15px 0 10px;
-    width: 300px;
-    text-align: left;
+  box-sizing: border-box;
+  display: none;
+  padding: 0 15px 0 10px;
+  width: 300px;
+  text-align: left;
 
-    > * {
-        white-space: nowrap;
-        overflow-x: hidden;
-        -ms-text-overflow: ellipsis;
-        text-overflow: ellipsis;
-        margin: 3px 0;
-    }
+  > * {
+    white-space: nowrap;
+    overflow-x: hidden;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    margin: 3px 0;
+  }
 
-    > p {
-        font-size: 12px;
-    }
+  > p {
+    font-size: 12px;
+  }
 }
 
 .progressBar {
-    width: 100%;
-    height: 5px;
-    background: grey;
+  width: 100%;
+  height: 5px;
+  background: grey;
 
-    > .inner {
-        height: 5px;
-        background: blue;
-    }
+  > .inner {
+    height: 5px;
+    background: blue;
+  }
 }
 
 .playback-buttons {
-    height: $status-bar-height;
-    line-height: $status-bar-height;
+  height: $status-bar-height;
+  line-height: $status-bar-height;
 
-    button {
-        background: none;
-        vertical-align: middle;
-        padding: 0 10px;
-    }
+  button {
+    background: none;
+    vertical-align: middle;
+    padding: 0 10px;
+  }
 }
 
 @media only screen and (min-width: $mobile-width-limit) {
-    .card {
-        height: $status-bar-height-desktop + 5px;
-    }
+  .card {
+    height: $status-bar-height-desktop + 5px;
+  }
 
-    .current-album {
-        max-height: $status-bar-height-desktop;
-        max-width: $status-bar-height-desktop;
-    }
+  .current-album {
+    max-height: $status-bar-height-desktop;
+    max-width: $status-bar-height-desktop;
+  }
 
-    .song-info {
-        display: inline-block;
-    }
+  .song-info {
+    display: inline-block;
+  }
 }

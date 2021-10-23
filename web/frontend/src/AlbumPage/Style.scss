@@ -1,76 +1,75 @@
-
 @import "../Vars";
 
 .trackItem {
-    padding: 6px;
-    background: $color-list-item;
-    border-radius: 5px;
-    margin: 6px 0;
-    position: relative;
+  padding: 6px;
+  background: $color-list-item;
+  border-radius: 5px;
+  margin: 6px 0;
+  position: relative;
 
-    > * {
-        display: inline-block;
-        vertical-align: middle;
-    }
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
 
-    button {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        display: none;
-    }
-    &:hover button {
-        display: inline-block;
-    }
+  button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    display: none;
+  }
+  &:hover button {
+    display: inline-block;
+  }
 }
 
 .addAlbum {
-    font-size: 1.1rem;
+  font-size: 1.1rem;
 }
 
 .info {
-    width: 450px;
-    display: inline-block;
+  width: 450px;
+  display: inline-block;
 }
 
 .trackNum {
-    font-size: 1.2rem;
-    width: 40px
+  font-size: 1.2rem;
+  width: 40px;
 }
 
 .title {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .artist {
-    font-size: 0.8rem;
+  font-size: 0.8rem;
 }
 
 .time {
-    margin-left: 5px
+  margin-left: 5px;
 }
 
 .column {
-    display: inline-block;
-    vertical-align: top;
+  display: inline-block;
+  vertical-align: top;
 
-    &.albumInfo {
-        margin-right: 10px;
-        width: 300px;
+  &.albumInfo {
+    margin-right: 10px;
+    width: 300px;
 
-        img {
-            width: 250px;
-            height: 250px;
-        }
+    img {
+      width: 250px;
+      height: 250px;
     }
+  }
 }
 
 @media only screen and (max-width: $mobile-width-limit) {
-    .column {
-        display: block;
-    };
-    .info {
-        width: 290px
-    }
+  .column {
+    display: block;
+  }
+  .info {
+    width: 290px;
+  }
 }

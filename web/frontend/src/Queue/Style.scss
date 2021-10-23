@@ -1,87 +1,86 @@
-
 @import "../Vars";
 
 button {
-    &.clearQueue, &.toggle, &.removeItem {
-        border: none;
-        font-size: 1rem;
-    }
+  &.clearQueue,
+  &.toggle,
+  &.removeItem {
+    border: none;
+    font-size: 1rem;
+  }
 
-    &.clearQueue {
-        background: #b02c40;
-        color: white;
-        margin-right: 20px;
+  &.clearQueue {
+    background: #b02c40;
+    color: white;
+    margin-right: 20px;
 
-        &:hover {
-            background: #900c20;
-            color: $color-text-dark;
-        }
+    &:hover {
+      background: #900c20;
+      color: $color-text-dark;
     }
+  }
 
-    &.toggle {
-        width: 140px;
-        background: #666;
-        margin-right: 3px;
-        &.enabled {
-            background: #0c8b00;
-            &:hover {
-                color: $color-text-dark;
-                background: #004b00
-            }
-        }
+  &.toggle {
+    width: 140px;
+    background: #666;
+    margin-right: 3px;
+    &.enabled {
+      background: #0c8b00;
+      &:hover {
+        color: $color-text-dark;
+        background: #004b00;
+      }
     }
+  }
 }
 
 .songInfo {
-    width: 400px
+  width: 400px;
 }
 
 @media only screen and (max-width: $mobile-width-limit) {
-    .songInfo {
-        width: auto;
-    }
-    .queueItem {
-        width: 100%;
-    }
-    .removeItem {
-        float: right;
-    }
+  .songInfo {
+    width: auto;
+  }
+  .queueItem {
+    width: 100%;
+  }
+  .removeItem {
+    float: right;
+  }
 }
 
 .queueItem {
-    background: $color-list-item;
-    padding: 7px 10px;
-    border-radius: 5px;
-    margin: 5px;
+  background: $color-list-item;
+  padding: 7px 10px;
+  border-radius: 5px;
+  margin: 5px;
+  display: inline-block;
+  box-sizing: border-box;
+
+  > * {
     display: inline-block;
-    box-sizing: border-box;
+    vertical-align: middle;
+  }
 
-    > * {
-        display: inline-block;
-        vertical-align: middle;
-    }
+  &.selected {
+    background: #0c8b00;
+  }
 
-    &.selected {
-        background: #0c8b00;
-
-    }
-
-    &:hover {
-        border: 2px solid $color-text-dark;
-        padding: 5px 8px;
-    }
+  &:hover {
+    border: 2px solid $color-text-dark;
+    padding: 5px 8px;
+  }
 }
 
-
 .trackTitle {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .trackDetails {
-    font-size: 0.9rem
+  font-size: 0.9rem;
 }
 
 .removeItem {
-    background: $color-button;
-    color: white;
+  background: $color-button;
+  color: white;
 }
