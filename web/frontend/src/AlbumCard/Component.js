@@ -12,11 +12,10 @@ export default function AlbumCard(props) {
   const src = albumArtUrl({ album, albumartist });
 
   return (
-    <div className={` ${styles.root}`} onClick={props.onClick}>
+    <div className={styles.root} onClick={props.onClick}>
       <img
         src={err ? `/static/notfound.png` : src}
         alt={album}
-        className={styles["image-medium"]}
         onError={() => setErr(true)}
       />
       <div className={styles["info-panel"]}>

@@ -1,35 +1,27 @@
 @import "../Vars";
 
-.image-small {
-  width: 150px;
-  height: 150px;
-}
-
-.image-medium {
-  max-width: 200px;
-  max-height: 200px;
-  width: 100%;
-  height: 100%;
-}
-
 @media only screen and (max-width: $mobile-width-limit) {
-  .image-medium {
-    max-width: 180px;
-    max-height: 180px;
+  .root {
+    width: 180px;
+    > img {
+      max-height: 180px;
+      max-width: 180px;
+    }
   }
-}
-
-.image-large {
-  width: 250px;
-  height: 250px;
 }
 
 .root {
   display: inline-block;
+  vertical-align: top;
   margin: 0 10px 10px 0;
   overflow: hidden;
   cursor: pointer;
   position: relative;
+  width: 200px;
+  > img {
+    max-height: 200px;
+    max-width: 200px;
+  }
 }
 
 .info-panel {
