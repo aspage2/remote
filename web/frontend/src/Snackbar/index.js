@@ -1,3 +1,2 @@
-
 export { default } from "./Container";
-export { reducer, Actions } from "./Ducks"
+export { reducer, Actions } from "./Ducks";

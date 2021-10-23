@@ -1,99 +1,97 @@
-
 @import "../Vars";
 
 .searchForm > * {
-    font-size: 20px;
-    background: $color-list-item;
-    border: 2px solid $color-bg-nav;
-    border-radius: 5px;
-    outline:none;
-    color: $color-text-dark;
-    &.mainInput {
-        padding: 10px;
-        &::placeholder {
-            color: #d0d0d0;
-        }
+  font-size: 20px;
+  background: $color-list-item;
+  border: 2px solid $color-bg-nav;
+  border-radius: 5px;
+  outline: none;
+  color: $color-text-dark;
+  &.mainInput {
+    padding: 10px;
+    &::placeholder {
+      color: #d0d0d0;
     }
-    &.mainSubmit {
-        margin-left: 5px;
-        padding: 5px 8px;
-        font-weight: bold;
-    }
+  }
+  &.mainSubmit {
+    margin-left: 5px;
+    padding: 5px 8px;
+    font-weight: bold;
+  }
 }
 
 @media only screen and (max-width: $mobile-width-limit) {
-    .searchForm > * {
-        font-size: 18px;
-        padding: 5px;
-    }
+  .searchForm > * {
+    font-size: 18px;
+    padding: 5px;
+  }
 }
 
 .column {
-    display:inline-block;
-    width: 400px;
-    vertical-align: top;
-    margin-right: 10px;
+  display: inline-block;
+  width: 400px;
+  vertical-align: top;
+  margin-right: 10px;
 }
 
 .item {
-    background-color: $color-list-item;
-    cursor:pointer;
-    margin: 5px;
-    padding: 8px;
-    font-size: 1.2rem;
-    border-radius: 3px;
-    position: relative;
+  background-color: $color-list-item;
+  cursor: pointer;
+  margin: 5px;
+  padding: 8px;
+  font-size: 1.2rem;
+  border-radius: 3px;
+  position: relative;
 
-    &.noPadding {
-        padding: 0;
-    }
+  &.noPadding {
+    padding: 0;
+  }
 
-    &.fixedWidth {
-        width: 400px
-    }
+  &.fixedWidth {
+    width: 400px;
+  }
 
-    &:hover{
-        text-decoration: underline;
-        button {
-            display: inline-block;
-        }
-    }
-
-    b {
-        font-size: 0.8rem;
-    }
-
-    img {
-        display:inline-block;
-        vertical-align: middle;
-        width: 80px;
-        height: 80px;
-    }
-
-    div {
-        display:inline-block;
-        vertical-align: middle;
-        max-width: 310px;
-        padding-left: 10px;
-        box-sizing: border-box;
-    }
-
+  &:hover {
+    text-decoration: underline;
     button {
-        background: $color-button;
-        border: none;
-        top: 0;
-        right: 0;
-        padding: 7px;
-        border-radius: 4px;
-        margin: 6px;
-        position: absolute;
-        display: none;
-        cursor: pointer;
-        color: white;
-
-        &:hover {
-            background: $color-button-hover;
-        }
+      display: inline-block;
     }
-}
+  }
 
+  b {
+    font-size: 0.8rem;
+  }
+
+  img {
+    display: inline-block;
+    vertical-align: middle;
+    width: 80px;
+    height: 80px;
+  }
+
+  div {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 310px;
+    padding-left: 10px;
+    box-sizing: border-box;
+  }
+
+  button {
+    background: $color-button;
+    border: none;
+    top: 0;
+    right: 0;
+    padding: 7px;
+    border-radius: 4px;
+    margin: 6px;
+    position: absolute;
+    display: none;
+    cursor: pointer;
+    color: white;
+
+    &:hover {
+      background: $color-button-hover;
+    }
+  }
+}
