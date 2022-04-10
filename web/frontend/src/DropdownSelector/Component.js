@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import _ from "lodash";
 import classnames from "classnames";
+import map from "lodash/map";
 
 import ArrowIcon from "../icons/arrow.svg";
 
@@ -33,7 +33,7 @@ class ListboxSelector extends Component {
             </span>
           </div>
           <div className="listbox-choices">
-            {_.map(this.props.choices, (choice, i) => (
+            {map(this.props.choices, (choice, i) => (
               <div
                 className="listbox-choice"
                 onClick={this.handleChoose(choice)}

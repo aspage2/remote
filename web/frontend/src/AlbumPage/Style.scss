@@ -2,6 +2,8 @@
 
 .trackItem {
   padding: 6px;
+  height: 45px;
+  line-height: 45px;
   background: $color-list-item;
   border-radius: 5px;
   margin: 6px 0;
@@ -12,14 +14,24 @@
     vertical-align: middle;
   }
 
-  button {
+  > .track-item-control {
+    display: none;
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     height: 100%;
-    display: none;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid black;
+    background: rgba(0, 0, 0, 0.4);
+
+    > button {
+      height: 80%;
+      margin: 3px;
+    }
   }
-  &:hover button {
+
+  &:hover .track-item-control {
     display: inline-block;
   }
 }

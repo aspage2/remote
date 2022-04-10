@@ -1,6 +1,7 @@
 import React from "react";
 
-import _ from "lodash";
+import sortBy from "lodash/sortBy";
+import map from "lodash/map";
 import AlbumCard from "../AlbumCard";
 import { useMPDQuery } from "../urls";
 import { albumListFromData, mpdQuery } from "../mpd";
@@ -8,19 +9,19 @@ import { albumListFromData, mpdQuery } from "../mpd";
 export default function ArtistPage(props) {
   const { artist, history } = props;
   const { data, loaded, err } = useMPDQuery(`find artist "${artist}"`);
-  const [show, setShow] = React.useState(false);
+  const [show, _] = React.useState(false);
 
   if (!loaded) return <div />;
   if (err) return <h3>Error!</h3>;
 
   const alb = albumListFromData(data);
-  const albums = _.sortBy(alb, (album) => album.date || 10000);
+  const albums = sortBy(alb, (album) => album.date || 10000);
 
   return (
     <React.Fragment>
       <h1>Albums from {artist}</h1>
       <div style={{ marginTop: "10px" }}>
-        {_.map(albums, (album, i) => (
+        {map(albums, (album, i) => (
           <AlbumCard
             key={i}
             info={album}

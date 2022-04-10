@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 
 BUF_SIZE = 1024
 
@@ -15,11 +16,17 @@ COMMAND_BLACKLIST = {
 }
 
 
-async def open_mpd(hostname):
+@contextlib.asynccontextmanager
+async def open_mpd(hostname, drop_header=True):
     """Open an asyncio stream to the MPD at hostname"""
     reader, writer = await asyncio.open_connection(hostname, 6600)
-    await reader.readline()
-    return reader, writer
+    try:
+        if drop_header:
+            await reader.readline()
+        yield reader, writer
+    finally:
+        writer.close()
+        await writer.wait_closed()
 
 
 async def read_mpd_response(reader: asyncio.StreamReader) -> bytes:
