@@ -3,11 +3,10 @@
 import os
 from shutil import copyfile
 
-from PIL import Image
 from flask import Flask, abort, send_file, send_from_directory
 from .mpd_socket import MPDSocket
 
-from .utils import absolute_image_path, get_single_file_from_mpd, look_for_image_in_dir, get_image_from_apic
+from .utils import absolute_image_path, get_album_files_from_mpd, look_for_image_in_dir, get_image_from_apic
 
 app = Flask(__name__)
 
@@ -30,21 +29,25 @@ def album_art(albumartist, album):
     if os.path.exists(hash_filename):
         return send_file(hash_filename)
         
-    mp3_file = get_single_file_from_mpd(albumartist, album, mpd)
-    if mp3_file is None:
+    mp3_files = get_album_files_from_mpd(albumartist, album, mpd)
+    if len(mp3_files) == 0:
         abort(404, f"not a pair in MPD: {albumartist} & {album}")
 
-    image_obj = get_image_from_apic(mp3_file)
-    if image_obj:
-        os.makedirs(hash_dir)
-        image_obj.save(hash_filename)
-        return send_file(hash_filename)
+    for fname in mp3_files:
+        try:
+            image_obj = get_image_from_apic(fname)
+            if image_obj:
+                os.makedirs(hash_dir, exist_ok=True)
+                image_obj.convert("RGB").save(hash_filename)
+                return send_file(hash_filename)
+        except Exception as e:
+            print(e)
 
-    image_file = look_for_image_in_dir(mp3_file)
-    if image_file:
-        os.makedirs(hash_dir)
-        copyfile(image_file, hash_filename)
-        return send_file(hash_filename)
+        image_file = look_for_image_in_dir(fname)
+        if image_file:
+            os.makedirs(hash_dir)
+            copyfile(image_file, hash_filename)
+            return send_file(hash_filename)
 
     abort(404)
 

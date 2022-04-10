@@ -27,12 +27,13 @@ def absolute_image_path(albumartist, album) -> str:
     return os.path.join(current_app.config['ALBUM_STORE'], hash_to_filepath(h))
 
 
-def get_single_file_from_mpd(albumartist, album, mpd):
-    resp = mpd.command(f"search albumartist \"{albumartist}\" album \"{album}\" window 0:1")
-    for k, v in parse_kv_pairs(resp):
-        if k == 'file':
-            return os.path.join(current_app.config["MUSIC_DIR"], v)
-    return None
+def get_album_files_from_mpd(albumartist, album, mpd):
+    resp = mpd.command(f"search albumartist \"{albumartist}\" album \"{album}\"")
+    return [
+        os.path.join(current_app.config["MUSIC_DIR"], v)
+        for k, v in parse_kv_pairs(resp)
+        if k == "file"
+    ]
 
 
 def look_for_image_in_dir(mp3):
