@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 
-import _ from "lodash";
+import map from "lodash/map";
 import classnames from "classnames";
 
 import styles from "./Style.scss";
@@ -47,7 +47,7 @@ function useSearchQuery(searchTerm) {
         for (const track of tracksFromData(data)) {
           artists.add(track.artist);
         }
-        res(_.map(Array.from(artists), (a) => ({ artist: a })));
+        res(map(Array.from(artists), (a) => ({ artist: a })));
       });
     });
     const album = new Promise((res, rej) => {
@@ -111,7 +111,7 @@ export function Search({ history, location }) {
           <h2>Results for "{searchQuery}"</h2>
           <div className={styles.column}>
             <h3>Artists</h3>
-            {_.map(results.artist, ({ artist }, i) => (
+            {map(results.artist, ({ artist }, i) => (
               <div
                 key={i}
                 className={styles.item}
@@ -123,7 +123,7 @@ export function Search({ history, location }) {
           </div>
           <div className={styles.column}>
             <h3>Albums</h3>
-            {_.map(results.album, ({ album, albumartist }, i) => (
+            {map(results.album, ({ album, albumartist }, i) => (
               <AlbumItem
                 key={i}
                 album={album}
@@ -138,7 +138,7 @@ export function Search({ history, location }) {
           </div>
           <div className={styles.column}>
             <h3>Tracks</h3>
-            {_.map(
+            {map(
               results.track,
               ({ title, album, track, albumartist, artist }, i) => (
                 <TrackItem

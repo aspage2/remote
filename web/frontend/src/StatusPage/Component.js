@@ -1,4 +1,5 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import axios from "axios";
 import { useMPDQuery, englishTimeStr } from "../urls";
 import classNames from "classnames";
 import styles from "./Styles.scss";
@@ -62,12 +63,23 @@ const SiteStats = (stats) => {
   );
 };
 
+function useHttpGet(path) {
+  const [status, setStatus] = useState({loaded: false, data: null, err: false});
+  
+  useEffect(() => {
+    axios.get(path).then(res => setStatus({loaded: true, err: false, data: res.data}));
+  }, [path]);
+  
+  return status;
+}
+
 function StatusPage(props) {
   const { data, loaded, err } = useMPDQuery("stats");
-  if (!loaded) {
+  const verStat = useHttpGet("/mpd/version");
+  if (!loaded || !verStat.loaded) {
     return <h3>...</h3>;
   }
-  if (err) {
+  if (err || verStat.err) {
     return <h3>Can't get statistics.</h3>;
   }
   const stats = objFromData(data);
@@ -76,6 +88,7 @@ function StatusPage(props) {
   return (
     <React.Fragment>
       <h1>System</h1>
+      <p>MPD Version: <b>{verStat.data.version}</b></p>
       <Link to={"/web/console"}>MPD Console</Link>
       <div>
         <div

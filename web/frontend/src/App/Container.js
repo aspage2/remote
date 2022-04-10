@@ -1,13 +1,14 @@
 import { connect } from "react-redux";
 import App from "./App";
 import { Actions } from "../Snackbar";
-import _ from "lodash";
+import isUndefined from "lodash/isUndefined";
+import isNull from "lodash/isNull";
 
 const mapStateToProps = (state) => ({
   queueCount: state.queue.length,
   dbUpdating: !(
-    _.isUndefined(state.playback.updating_db) ||
-    _.isNull(state.playback.updating_db)
+    isUndefined(state.playback.updating_db) ||
+    isNull(state.playback.updating_db)
   ),
   volume: state.playback.volume,
   isConnected: state.connected,

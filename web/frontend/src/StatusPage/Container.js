@@ -1,12 +1,13 @@
 import { connect } from "react-redux";
 import Component from "./Component";
 
-import _ from "lodash";
+import isUndefined from "lodash/isUndefined";
+import isNull from "lodash/isNull";
 
 const mapStateToProps = (state) => ({
   isUpdating: !(
-    _.isUndefined(state.playback.updating_db) ||
-    _.isNull(state.playback.updating_db)
+    isUndefined(state.playback.updating_db) ||
+    isNull(state.playback.updating_db)
   ),
 });
 

@@ -3,7 +3,8 @@ import React from "react";
 import axios from "axios";
 
 import { SocketContext } from "../socket";
-import _ from "lodash";
+import map from "lodash/map";
+import includes from "lodash/includes";
 
 import styles from "./Style.scss";
 
@@ -49,11 +50,11 @@ function ChannelPage(props) {
         >
           STATUS: {currChannels.length === 0 ? "OFF" : "ON"}
         </button>
-        {_.map(channels.channels, (channel, i) => (
+        {map(channels.channels, (channel, i) => (
           <div key={i}>
             <ToggleButton
               text={channel.desc}
-              active={_.includes(currChannels, channel.name)}
+              active={includes(currChannels, channel.name)}
               onClick={() => setChannel(channel.name)}
             />
           </div>

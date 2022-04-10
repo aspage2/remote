@@ -32,6 +32,7 @@ export default function App(props) {
       [styles["root-nav"]]: true,
       [styles.open]: !smallScreen || drawerOpen,
     });
+    const Link_ = (props) => <Link onClick={() => setDrawer(false)} {...props}/>
     return (
       <div className={cn} onClick={() => setDrawer(false)}>
         <div onClick={(ev) => ev.stopPropagation()} className={styles.nav}>
@@ -40,21 +41,11 @@ export default function App(props) {
               <NavButton light onClick={() => setDrawer(false)} />
             </div>
           )}
-          <Link onClick={() => setDrawer(false)} to="/web/search">
-            Search
-          </Link>
-          <Link onClick={() => setDrawer(false)} to="/web/browse/genre">
-            Browse
-          </Link>
-          <Link onClick={() => setDrawer(false)} to="/web/queue">
-            Queue {props.queueCount ? ` (${props.queueCount})` : ""}
-          </Link>
-          <Link onClick={() => setDrawer(false)} to="/web/channels">
-            Channels
-          </Link>
-          <Link onClick={() => setDrawer(false)} to="/web/stats">
-            Settings {props.dbUpdating ? " (U)" : ""}
-          </Link>
+          <Link_ to="/web/search">Search</Link_>
+          <Link_ to="/web/browse/genre">Browse</Link_>
+          <Link_ to="/web/queue">Queue {props.queueCount ? ` (${props.queueCount})` : ""}</Link_>
+          <Link_ to="/web/channels">Channels</Link_>
+          <Link_ to="/web/stats">Settings {props.dbUpdating ? " (U)" : ""}</Link_>
           <div
             className={styles.noConnection}
             style={{ display: props.isConnected ? "none" : "block" }}

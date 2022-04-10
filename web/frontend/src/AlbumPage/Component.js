@@ -83,7 +83,9 @@ export default function AlbumPage({ album, albumartist, showMessage }) {
               )}
             </div>
             <span className={styles.time}>{timeStr(track.time)}</span>
-            <button onClick={() => trackAdd(track.track)}>Add</button>
+            <div className={styles["track-item-control"]}>
+              <button onClick={() => trackAdd(track.track)}>Add</button>
+            </div>
           </div>
         ))}
       </div>
