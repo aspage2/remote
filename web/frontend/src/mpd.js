@@ -7,19 +7,9 @@ import { Actions as QueueActions } from "./Queue";
 import { Actions as SnackbarActions } from "./Snackbar";
 import { Actions as GlobalActions } from "./Ducks";
 
-export function mpdQuery(command) {
-  const ws = new WebSocket(`ws://${location.host}/ws/mpd/command`);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => reject(), 5000);
-    ws.onmessage = function (ev) {
-      resolve(ev.data);
-    };
-    ws.onopen = function () {
-      ws.send(command);
-    };
-  }).finally(() => {
-    ws.close();
-  });
+export async function mpdQuery(command) {
+  const resp = await fetch(`/go/cmd?q=${encodeURIComponent(command)}`);
+  return await resp.text();
 }
 
 export function* parsePairs(data) {
@@ -104,53 +94,35 @@ const STATUS_UPDATE_TYPES = [
 ];
 const PLAYLIST_UPDATE_TYPES = ["playlist"];
 const DB_UPDATE_TYPES = ["update"];
-const CHANNEL_UPDATE_TYPES = ["gpiochannel"];
 
 export function startMpdWatcher(dispatch) {
-  const run = (res) => {
-    const ws = new WebSocket(`ws://${location.host}/ws/mpd/idle`);
-    ws.onopen = () => dispatch(GlobalActions.setConnection(true));
-    ws.onmessage = function (ev) {
-      const changedList = JSON.parse(ev.data);
-      let updateStatus = false,
-        updateQueue = false,
-        updateDB = false,
-        updateChannels = false;
+  const es = new EventSource("/go/events");
 
-      for (const changed of changedList) {
-        if (STATUS_UPDATE_TYPES.includes(changed)) {
-          updateStatus = true;
-        }
-        if (PLAYLIST_UPDATE_TYPES.includes(changed)) {
-          updateQueue = true;
-        }
-        if (DB_UPDATE_TYPES.includes(changed)) {
-          updateDB = true;
-        }
-        if (CHANNEL_UPDATE_TYPES.includes(changed)) {
-          updateChannels = true;
-        }
-      }
-      if (updateStatus) {
-        pullPlaybackInfo().then((pb) =>
-          dispatch(PlaybackActions.setPlayback(pb))
-        );
-      }
-      if (updateQueue) {
-        pullQueueInfo().then((q) => dispatch(QueueActions.setQueue(q)));
-      }
-      if (updateDB) {
-        dispatch(SnackbarActions.showSnackbar("database update"));
-      }
-    };
-    ws.onclose = res;
-    ws.onerror = res;
-  };
-  return new Promise(async () => {
-    while (true) {
-      await new Promise(run);
-      dispatch(GlobalActions.setConnection(false));
-      await new Promise((res) => setTimeout(res, 1000));
+  es.onerror = () => {
+		dispatch(GlobalActions.setConnection(false));
+	};
+
+	es.onopen = () => {
+		dispatch(GlobalActions.setConnection(true));
+	};
+
+	es.addEventListener("ping", () => {
+		dispatch(GlobalActions.setConnection(true));
+	});
+  
+  es.onmessage = function (ev) {
+		dispatch(GlobalActions.setConnection(true));
+    const changed = ev.data;
+    if (STATUS_UPDATE_TYPES.includes(changed)) {
+      pullPlaybackInfo().then((pb) =>
+        dispatch(PlaybackActions.setPlayback(pb))
+      );
     }
-  });
+    if (PLAYLIST_UPDATE_TYPES.includes(changed)) {
+      pullQueueInfo().then((q) => dispatch(QueueActions.setQueue(q)));
+    }
+    if (DB_UPDATE_TYPES.includes(changed)) {
+      dispatch(SnackbarActions.showSnackbar("database update"));
+    }
+  };
 }

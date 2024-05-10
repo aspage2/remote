@@ -1,8 +1,5 @@
 import React from "react";
 
-import axios from "axios";
-
-import { SocketContext } from "../socket";
 import map from "lodash/map";
 import includes from "lodash/includes";
 
@@ -11,16 +8,22 @@ import styles from "./Style.scss";
 import classnames from "classnames";
 import ToggleButton from "../ToggleButton";
 
-function ChannelPage(props) {
+export default function ChannelPage(props) {
   const { channels, putChannels, putSnackbarMessage } = props;
   const currChannels = channels.active;
 
   const setChannel = (chan) => {
-    axios
-      .post("/gpio/channels", {
-        channel_id: chan,
-        action: "toggle",
-      })
+    const req = {
+      channel_id: chan,
+      action: "toggle",
+    };
+    fetch("/gpio/channels", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req),
+    })
       .then((res) => {
         putChannels(res.data);
       })
@@ -29,13 +32,16 @@ function ChannelPage(props) {
       });
   };
   const sysOff = () => {
-    axios
-      .post("/gpio/channels", {
-        action: "sys_off",
-      })
-      .then((res) => {
-        putChannels(res.data);
-      });
+    const req = { action: "sys_off" };
+    fetch("/gpio/channels", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req),
+    }).then((res) => {
+      putChannels(res.data);
+    });
   };
   return (
     <React.Fragment>
@@ -64,8 +70,3 @@ function ChannelPage(props) {
   );
 }
 
-export default (props) => (
-  <SocketContext.Consumer>
-    {(socket) => <ChannelPage socket={socket} {...props} />}
-  </SocketContext.Consumer>
-);

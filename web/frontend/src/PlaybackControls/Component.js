@@ -93,7 +93,7 @@ export default function PlaybackControls({ queue, playback }) {
     msg = "play";
     msgIcon = <PlayIcon {...buttonIconDim} />;
   }
-  const { album, title, artist, albumartist } =
+  const { album, title, artist } =
     !isEmpty(song) &&
     find(queue || [], ({ pos }) => String(pos) === String(song));
 

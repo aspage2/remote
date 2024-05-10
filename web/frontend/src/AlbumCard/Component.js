@@ -1,7 +1,7 @@
 import React from "react";
 
 import styles from "./Style.scss";
-import { albumArtUrl } from "../urls";
+import urls from "../urls";
 
 export default function AlbumCard(props) {
   const [err, setErr] = React.useState(false);
@@ -9,7 +9,7 @@ export default function AlbumCard(props) {
   const {
     info: { album, albumartist, date },
   } = props;
-  const src = albumArtUrl({ album, albumartist });
+  const src = urls.albumArtUrl({ album, albumartist });
 
   return (
     <div className={styles.root} onClick={props.onClick}>

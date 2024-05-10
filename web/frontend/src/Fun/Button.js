@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import styles from "./Style.scss";
 
@@ -49,16 +49,17 @@ function HoldButton(props) {
 export default () => {
   const [active, setActive] = useState(false);
   const timeoutRef = useRef(0);
-  
+
   useEffect(() => {
-    if (!active)
-      return
+    if (!active) return;
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => setActive(false), 2000);
   }, [active]);
-  
-  return <div>
-    <HoldButton onActivate={()=>setActive(true)} duration={1000}/>
-    {active && <h2>Active</h2> || <h2>Inactive</h2>}
-  </div>
+
+  return (
+    <div>
+      <HoldButton onActivate={() => setActive(true)} duration={1000} />
+      {(active && <h2>Active</h2>) || <h2>Inactive</h2>}
+    </div>
+  );
 };

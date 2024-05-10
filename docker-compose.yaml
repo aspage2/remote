@@ -1,4 +1,3 @@
-version: "3.5"
 services:
   mpd:
     build: fake_mpd/
@@ -27,6 +26,12 @@ services:
       - ./web/pins.yaml:/data/pins.yaml
     ports:
      - 80
+  proxy:
+    build: mpd-web-proxy/
+    environment:
+      MPD_AUTHORITY: mpd:6600
+    ports:
+      - 8000
   nginx:
     image: nginx
     volumes:
