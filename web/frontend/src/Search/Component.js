@@ -4,13 +4,12 @@ import map from "lodash/map";
 import classnames from "classnames";
 
 import styles from "./Style.scss";
-import { albumArtUrl } from "../urls";
-import { SocketContext } from "../socket";
+import urls from "../urls";
 import { albumListFromData, mpdQuery, tracksFromData } from "../mpd";
 
 const AlbumItem = ({ album, albumartist, onClick }) => (
   <div className={classnames(styles.item, styles.noPadding)} onClick={onClick}>
-    <img src={albumArtUrl({ album, albumartist })} />
+    <img src={urls.albumArtUrl({ album, albumartist })} />
     <div>
       {album}
       <br />
@@ -75,7 +74,7 @@ function useSearchQuery(searchTerm) {
   return loadState;
 }
 
-export function Search({ history, location }) {
+export default function Search({ history, location }) {
   const q = new URLSearchParams(location.search);
   const loadedSearchTerm = q.get("q") || "";
 
@@ -115,7 +114,7 @@ export function Search({ history, location }) {
               <div
                 key={i}
                 className={styles.item}
-                onClick={() => history.push(`/web/artist/${artist}`)}
+                onClick={() => history.push(urls.artistPage({artist}))}
               >
                 {artist}
               </div>
@@ -128,11 +127,9 @@ export function Search({ history, location }) {
                 key={i}
                 album={album}
                 albumartist={albumartist}
-                onClick={() => {
-                  history.push(
-                    `/web/albumartist/${albumartist}/album/${album}`
-                  );
-                }}
+                onClick={() => 
+                  history.push(urls.albumPage({albumartist, album}))
+                }
               />
             ))}
           </div>
@@ -146,14 +143,10 @@ export function Search({ history, location }) {
                   title={title}
                   album={album}
                   artist={artist}
-                  onClick={() =>
-                    history.push(
-                      `/web/albumartist/${albumartist}/album/${album}`
-                    )
-                  }
-                  add={() => {
-                    socket.emit("findadd", { album, albumartist, track });
-                  }}
+									onClick={() => 
+										history.push(urls.albumPage({albumartist, album}))
+									}
+                  add={() => mpdQuery(`findadd album "${album}" albumartist "${albumartist}" track "${track}"`)}
                 />
               )
             )}
@@ -165,9 +158,3 @@ export function Search({ history, location }) {
     </React.Fragment>
   );
 }
-
-export default (props) => (
-  <SocketContext.Consumer>
-    {(socket) => <Search socket={socket} {...props} />}
-  </SocketContext.Consumer>
-);

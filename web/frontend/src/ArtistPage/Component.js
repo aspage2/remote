@@ -3,8 +3,9 @@ import React from "react";
 import sortBy from "lodash/sortBy";
 import map from "lodash/map";
 import AlbumCard from "../AlbumCard";
-import { useMPDQuery } from "../urls";
-import { albumListFromData, mpdQuery } from "../mpd";
+import { useMPDQuery } from "../hooks";
+import { albumListFromData } from "../mpd";
+import urls from "../urls";
 
 export default function ArtistPage(props) {
   const { artist, history } = props;
@@ -27,9 +28,7 @@ export default function ArtistPage(props) {
             info={album}
             hideDetails={!show}
             onClick={() =>
-              history.push(
-                `/web/albumartist/${album.albumartist}/album/${album.album}`
-              )
+              history.push(urls.albumPage({albumartist: album.albumartist, album: album.album}))
             }
           />
         ))}

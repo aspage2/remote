@@ -1,6 +1,6 @@
 import React from "react";
 
-import { albumArtUrl } from "../urls";
+import urls from "../urls";
 
 import styles from "./Style.scss";
 
@@ -11,7 +11,7 @@ export default function CurrentAlbum(props) {
 
   if (!playback.hasOwnProperty("song")) return <div className={styles.err} />;
 
-  const src = albumArtUrl(queue[parseInt(playback.song)]);
+  const src = urls.albumArtUrl(queue[parseInt(playback.song)]);
   return err ? (
     <div className={styles.err} />
   ) : (

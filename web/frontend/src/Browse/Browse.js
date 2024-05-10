@@ -1,9 +1,10 @@
+import urls from "../urls";
 import React from "react";
 import { Link, Route, Switch } from "react-router-dom";
 
 import map from "lodash/map";
 
-import { useMPDQuery } from "../urls";
+import { useMPDQuery } from "../hooks";
 import { parsePairs } from "../mpd";
 
 import styles from "./Style.scss";
@@ -12,7 +13,7 @@ function GenreList() {
   const { loaded, err, data } = useMPDQuery("list genre");
   if (!loaded) return <div />;
   if (err) {
-    return <h3>Error occurred: {JSON.stringify(error)}</h3>;
+    return <h3>Error occurred: {JSON.stringify(err)}</h3>;
   }
   return (
     <>
@@ -20,7 +21,7 @@ function GenreList() {
       <div className={styles.list}>
         {map(Array.from(parsePairs(data)), ([_, v]) => (
           <div key={v} className={styles.list}>
-            <Link to={`/web/browse/genre/${encodeURIComponent(v)}`}>{v}</Link>
+            <Link to={urls.browseGenrePage({genre: v})}>{v}</Link>
           </div>
         ))}
       </div>
@@ -37,7 +38,7 @@ function GenrePage(props) {
   );
   if (!loaded) return <div />;
   if (err) {
-    return <h3>Error occurred: {JSON.stringify(error)}</h3>;
+    return <h3>Error occurred: {JSON.stringify(err)}</h3>;
   }
 
   return (
@@ -45,8 +46,8 @@ function GenrePage(props) {
       <h1>Artists for {genreName}</h1>
       <div className={styles.list}>
         {map(Array.from(parsePairs(data)), ([_, v]) => (
-          <div>
-            <Link to={`/web/artist/${encodeURIComponent(v)}`}>{v}</Link>
+          <div key={v}>
+            <Link to={urls.artistPage({artist: v})}>{v}</Link>
           </div>
         ))}
       </div>

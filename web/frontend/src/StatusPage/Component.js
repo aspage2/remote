@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from "react";
-import axios from "axios";
-import { useMPDQuery, englishTimeStr } from "../urls";
+import React from "react";
+import urls from "../urls";
+import { englishTimeStr } from "../utils";
+import { useHttpGet, useMPDQuery } from "../hooks";
 import classNames from "classnames";
 import styles from "./Styles.scss";
 import globalStyles from "../Global.scss";
-import { SocketContext } from "../socket";
 import { mpdQuery, objFromData } from "../mpd";
 import { Link } from "react-router-dom";
 
@@ -63,19 +63,10 @@ const SiteStats = (stats) => {
   );
 };
 
-function useHttpGet(path) {
-  const [status, setStatus] = useState({loaded: false, data: null, err: false});
-  
-  useEffect(() => {
-    axios.get(path).then(res => setStatus({loaded: true, err: false, data: res.data}));
-  }, [path]);
-  
-  return status;
-}
 
-function StatusPage(props) {
+export default function StatusPage(props) {
   const { data, loaded, err } = useMPDQuery("stats");
-  const verStat = useHttpGet("/mpd/version");
+  const verStat = useHttpGet("/go/mpd/version");
   if (!loaded || !verStat.loaded) {
     return <h3>...</h3>;
   }
@@ -88,8 +79,10 @@ function StatusPage(props) {
   return (
     <React.Fragment>
       <h1>System</h1>
-      <p>MPD Version: <b>{verStat.data.version}</b></p>
-      <Link to={"/web/console"}>MPD Console</Link>
+      <p>
+        MPD Version: <b>{verStat.data.version}</b>
+      </p>
+      <Link to={urls.consolePage()}>MPD Console</Link>
       <div>
         <div
           className={classNames(styles.dbUpdate, { [styles.active]: updating })}
@@ -107,9 +100,3 @@ function StatusPage(props) {
     </React.Fragment>
   );
 }
-
-export default (props) => (
-  <SocketContext.Consumer>
-    {(socket) => <StatusPage socket={socket} {...props} />}
-  </SocketContext.Consumer>
-);

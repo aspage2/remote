@@ -11,8 +11,9 @@ COPY Pipfile Pipfile.lock /code/
 RUN apt-get update; \
     apt-get install -y --no-install-recommends gcc; \
     pip install pipenv; \
-    pipenv install --system --deploy; \
-    pip uninstall pipenv -y; \
+    pipenv requirements > requirements.txt; \
+    #pip uninstall pipenv -y; \
+	pip install -r requirements.txt; \
     apt-get purge -y --auto-remove gcc
 
 COPY remote /code/remote/

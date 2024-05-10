@@ -1,23 +1,28 @@
 import React from "react";
-import { albumArtUrl, timeStr, useMPDQuery } from "../urls";
+import { timeStr } from "../utils";
+import { useMPDQuery } from "../hooks";
+import urls from "../urls";
 
 import toPairs from "lodash/toPairs";
-import groupBy from "lodash/groupBy";
 import sumBy from "lodash/sumBy";
 import maxBy from "lodash/maxBy";
 import uniqBy from "lodash/uniqBy";
 import map from "lodash/map";
+import countBy from "lodash/countBy";
+import isEmpty from "lodash/isEmpty";
 
 import styles from "./Style.scss";
 import { mpdQuery, tracksFromData } from "../mpd";
 
 // mostCommonValue returns the value which makes up the majority of
 // items in a set.
-const mostCommonValue = (l, k) =>
-  (maxBy(toPairs(groupBy(l, k)), ([__, vals]) => vals.length) || [
-    undefined,
-    undefined,
-  ])[0];
+function mostCommonValue(l, k) {
+	if (isEmpty(l)) {
+		return [undefined, undefined];
+	}
+	const counts = countBy(l, k);
+	return maxBy(toPairs(counts), ([_, c]) => c);
+};
 
 export default function AlbumPage({ album, albumartist, showMessage }) {
   const { loaded, err, data } = useMPDQuery(
@@ -54,7 +59,7 @@ export default function AlbumPage({ album, albumartist, showMessage }) {
     <React.Fragment>
       <h1>{album}</h1>
       <div className={`${styles.albumInfo} ${styles.column}`}>
-        <img alt={album} src={albumArtUrl({ albumartist, album })} />
+        <img alt={album} src={urls.albumArtUrl({ albumartist, album })} />
         <br />
         <br />
         <b>{albumartist}</b>
