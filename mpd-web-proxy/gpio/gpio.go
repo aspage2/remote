@@ -34,7 +34,7 @@ func (n *NopBackend) Set(pin int, state PhysicalState) error {
 	if state {
 		newState = "HIGH"
 	}
-	fmt.Printf("Set pin %d to %s\n", pin, newState)
+	fmt.Printf("\u001b[32mSet pin %d to %s\u001b[0m\n", pin, newState)
 	return nil
 }
 

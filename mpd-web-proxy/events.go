@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"strings"
 	"time"
@@ -21,8 +22,8 @@ const (
 func startChannelListener(mpd net.Conn) chan string {
 	eventC := make(chan string)
 	go func() {
-		fmt.Println("start channel listener")
-		defer fmt.Println("end channel listener")
+		slog.Debug("start channel listener")
+		defer slog.Debug("end channel listener")
 		defer close(eventC)
 		sc := bufio.NewScanner(mpd)
 		// MPD Header
@@ -37,16 +38,16 @@ func startChannelListener(mpd net.Conn) chan string {
 				}
 				parts := strings.SplitN(line, ":", 2)
 				if len(parts) != 2 {
-					fmt.Printf("unexpected string: %s\n", line)
+					slog.Error(fmt.Sprintf("unexpected string: %s\n", line))
 					return
 				}
 				ev := strings.TrimSpace(parts[1])
-				fmt.Println("sending event:", ev)
+				slog.Debug(fmt.Sprint("sending event:", ev))
 				eventC <- ev
 			}
 			if err := sc.Err(); err != nil {
 				if _, ok := err.(*net.OpError); !ok {
-					fmt.Printf("unexpected error: %T %s\n", err, err)
+					slog.Error(fmt.Sprintf("unexpected error: %T %s\n", err, err))
 				}
 				return
 			}
