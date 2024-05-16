@@ -1,6 +1,0 @@
-mode: BCM
-amp:
-  pin: 6
-channels:
- - pin: 4
-   name: Family Room

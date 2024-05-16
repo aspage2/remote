@@ -17,15 +17,16 @@ export default function ChannelPage(props) {
       channel_id: chan,
       action: "toggle",
     };
-    fetch("/gpio/channels", {
+    fetch("/go/channels", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(req),
     })
-      .then((res) => {
-        putChannels(res.data);
+      .then((res) => res.json())
+		  .then(data => {
+        putChannels(data);
       })
       .catch((reason) => {
         putSnackbarMessage(`Error: ${reason.response.data.detail}`);
@@ -33,7 +34,7 @@ export default function ChannelPage(props) {
   };
   const sysOff = () => {
     const req = { action: "sys_off" };
-    fetch("/gpio/channels", {
+    fetch("/go/channels", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
