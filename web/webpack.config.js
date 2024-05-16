@@ -6,7 +6,7 @@ module.exports = {
   entry: "./src/index.js",
   output: {
     filename: "remote.js",
-    path: path.join(__dirname, "../dist"),
+    path: path.join(__dirname, "dist"),
   },
   plugins: [
     new BundlePlugin({openAnalyzer: false}),
