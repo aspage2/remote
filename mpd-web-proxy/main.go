@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"net/http"
 	"strings"
@@ -14,19 +15,19 @@ import (
 
 const (
 	ChannelToggle = "toggle"
-	ChannelOn = "on"
-	ChannelOff = "off"
+	ChannelOn     = "on"
+	ChannelOff    = "off"
 )
 
 type Server struct {
-	Pins []gpio.Pin
+	Pins     []gpio.Pin
 	PinState *gpio.PinState
 }
 
 func (s *Server) WriteResponse(wr io.Writer) error {
 	var envelope struct {
-		Active []gpio.PinId `json:"active"`
-		Channels []gpio.Pin `json:"channels"`
+		Active   []gpio.PinId `json:"active"`
+		Channels []gpio.Pin   `json:"channels"`
 	}
 	envelope.Channels = s.Pins
 	envelope.Active = s.PinState.ActiveChannels()
@@ -38,8 +39,8 @@ func (s *Server) WriteResponse(wr io.Writer) error {
 
 func (s *Server) PutChannel(rw http.ResponseWriter, req *http.Request) error {
 	var envelope struct {
-		Pin gpio.PinId `json:"channel_id"`
-		Action *string `json:"action"`
+		Pin    gpio.PinId `json:"channel_id"`
+		Action *string    `json:"action"`
 	}
 	defer req.Body.Close()
 	err := json.NewDecoder(req.Body).Decode(&envelope)
@@ -88,9 +89,9 @@ func WriteBadRequest(rw http.ResponseWriter, msg string) {
 	fmt.Fprintf(rw, "ACK: %s\n", msg)
 }
 
-func  MpdEvents(rw http.ResponseWriter, req *http.Request) {
-	fmt.Println("client requested events.")
-	defer fmt.Println("client exited")
+func MpdEvents(rw http.ResponseWriter, req *http.Request) {
+	slog.Info(fmt.Sprintf("%s %s", req.RemoteAddr, req.URL))
+	defer slog.Info(fmt.Sprintf("%s %s CLIENT EXIT", req.RemoteAddr, req.URL))
 
 	hdr := rw.Header()
 	hdr.Set("Content-Type", "text/event-stream")
@@ -113,12 +114,14 @@ func  MpdEvents(rw http.ResponseWriter, req *http.Request) {
 		case EventTypePing:
 			eventPayload = "event: ping\ndata: hello\n\n"
 		case EventTypeMPD:
-			fmt.Printf("MPD event: %s\n", ev.Data)
+			slog.Debug(fmt.Sprintf("MPD event: %s\n", ev.Data))
 			eventPayload = fmt.Sprintf("data: %s\n\n", ev.Data)
 		}
 		_, err := io.WriteString(rw, eventPayload)
 		if err != nil {
-			fmt.Printf("error sending event to client: %T %s\n", err, err)
+			slog.Error(
+				fmt.Sprintf("error sending event to client: %T %s\n", err, err),
+			)
 			return
 		}
 		rw.(http.Flusher).Flush()
@@ -151,13 +154,14 @@ func MpdVersion(rw http.ResponseWriter, req *http.Request) {
 }
 
 func httpServer(s *Server) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "index.html")
-	})
-	http.HandleFunc("/go/cmd", MpdCommand)
+	var nonEventMux http.ServeMux
+	nonEventMux.HandleFunc("/go/cmd", MpdCommand)
+	nonEventMux.HandleFunc("/go/mpd/version", MpdVersion)
+	nonEventMux.HandleFunc("/go/channels", s.Channels)
+
+	http.Handle("/go/", loggingMiddleware(&nonEventMux))
 	http.HandleFunc("/go/events", MpdEvents)
-	http.HandleFunc("/go/mpd/version", MpdVersion)
-	http.HandleFunc("/go/channels", s.Channels)
+
 	http.ListenAndServe(":8000", nil)
 }
 
@@ -175,6 +179,6 @@ func main() {
 	}
 	var s Server
 	s.PinState = ps
-	s.Pins = pins 
+	s.Pins = pins
 	httpServer(&s)
 }
