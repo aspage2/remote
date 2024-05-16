@@ -12,38 +12,40 @@ export default function ChannelPage(props) {
   const { channels, putChannels, putSnackbarMessage } = props;
   const currChannels = channels.active;
 
-  const setChannel = (chan) => {
+  async function setChannel(chan) {
     const req = {
       channel_id: chan,
       action: "toggle",
     };
-    fetch("/go/channels", {
+    const resp = await fetch("/go/channels", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(req),
-    })
-      .then((res) => res.json())
-		  .then(data => {
-        putChannels(data);
-      })
-      .catch((reason) => {
-        putSnackbarMessage(`Error: ${reason.response.data.detail}`);
-      });
-  };
-  const sysOff = () => {
-    const req = { action: "sys_off" };
-    fetch("/go/channels", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req),
-    }).then((res) => {
-      putChannels(res.data);
     });
+		if (!resp.ok) {
+			putSnackbarMessage(await resp.text());
+			return
+		}
+		const data = await resp.json();
+		putChannels(data);
   };
+  async function sysOff() {
+    const response = await fetch("/go/channels", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+			body: `{"action": "sys_off"}`, 
+    });
+		if (!response.ok) {
+			putSnackbarMessage(await response.text());
+			return;
+		}
+		putChannels(await response.json());
+  };
+
   return (
     <React.Fragment>
       <h1>Audio Channels</h1>
