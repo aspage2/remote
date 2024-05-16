@@ -5,6 +5,7 @@ EXPOSE 8000
 WORKDIR /app
 
 COPY *.go ./
+COPY gpio/ ./gpio/
 COPY go.mod go.sum ./
 
 RUN go build -o /app/main

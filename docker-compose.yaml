@@ -16,20 +16,12 @@ services:
       - ./fake_mpd/store:/data/store
     ports:
       - 80
-  web:
-    build: web/
-    environment:
-      MPD_HOST: mpd
-      PINOUT_FILE: /data/pins.yaml
-    volumes:
-      - ./web/remote:/code/remote
-      - ./web/pins.yaml:/data/pins.yaml
-    ports:
-     - 80
   proxy:
     build: mpd-web-proxy/
     environment:
       MPD_AUTHORITY: mpd:6600
+    volumes:
+      - ./mpd-web-proxy/pins.yaml:/app/pins.yaml
     ports:
       - 8000
   nginx:

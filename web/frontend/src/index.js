@@ -12,12 +12,13 @@ import "./Global.scss";
 
 const root = document.getElementById("root");
 
-let initial = {
-  channels: {
-    active: [],
-    channels: [{ name: "foo", desc: "Barr" }],
-  },
-};
+let initial = {};
+
+async function pullChannels() {
+	const resp = await fetch("/go/channels");
+	const data = await resp.json();
+	return data;
+}
 
 // Pull current status, then render site
 Promise.all([
@@ -27,9 +28,7 @@ Promise.all([
   pullQueueInfo().then((res) => {
     initial.queue = res;
   }),
-  // axios.get("/gpio/channels").then((res) => {
-  //   initial.channels = res.data;
-  // }),
+	pullChannels().then(res => {initial.channels = res}),
 ])
   .then(() => {
     const store = createStore(reducer(initial));
