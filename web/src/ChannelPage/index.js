@@ -1,2 +1,1 @@
-export { Actions, makeReducer } from "./Ducks";
-export { default } from "./Container";
+export { default } from "./Component";

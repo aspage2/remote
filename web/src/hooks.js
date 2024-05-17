@@ -34,7 +34,7 @@ export function useHttpGet(path) {
  * @param cmd MPD query
  * @returns {{loaded: boolean, err: boolean, data: *}}
  */
-export const useMPDQuery = (cmd) => {
+export function useMPDQuery(cmd) {
 	const [ls, success, err, reset] = useLoadState();
 
   useEffect(() => {

@@ -1,51 +1,44 @@
-import React from "react";
-
-import { createStore } from "redux";
-import { pullPlaybackInfo, pullQueueInfo, startMpdWatcher } from "./mpd";
+import React, { useContext, useEffect } from "react";
+import { startMpdWatcher } from "./mpd";
 
 import App from "./App";
 import ReactDOM from "react-dom";
-import { Provider as StoreProvider } from "react-redux";
-import reducer from "./Ducks";
+import { MpdStateProvider } from "./context";
 
 import "./Global.scss";
 
-const root = document.getElementById("root");
+import { SnackbarContext } from "./Snackbar/Context";
+import { ConnectionContext } from "./App/Context";
+import { QueueContext } from "./Queue/Context";
+import { PlaybackContext } from "./PlaybackControls/Context";
 
-let initial = {};
+import { pullPlaybackInfo, pullQueueInfo } from "./mpd";
 
-async function pullChannels() {
-	const resp = await fetch("/go/channels");
-	const data = await resp.json();
-	return data;
+function Root() {
+	const { setConnected } = useContext(ConnectionContext);
+	const { showSnackbar } = useContext(SnackbarContext);
+	const { setQueue } = useContext(QueueContext);
+	const { setPlayback } = useContext(PlaybackContext);
+
+	useEffect(
+		() => startMpdWatcher(
+			setConnected,
+			setPlayback,
+			setQueue,
+			showSnackbar
+		),
+		[],
+	);
+
+	return <App />
 }
-
-// Pull current status, then render site
+let initial = {};
 Promise.all([
-  pullPlaybackInfo().then((res) => {
-    initial.playback = res;
-  }),
-  pullQueueInfo().then((res) => {
-    initial.queue = res;
-  }),
-	pullChannels().then(res => {initial.channels = res}),
-])
-  .then(() => {
-    const store = createStore(reducer(initial));
-    startMpdWatcher(store.dispatch);
-    ReactDOM.render(
-      <StoreProvider store={store}>
-        <App />
-      </StoreProvider>,
-      root
-    );
-  })
-  .catch((err) => {
-    ReactDOM.render(
-      <>
-        <h1>Congrats, it's broken.</h1>
-        <p>Error: {JSON.stringify(err)}</p>
-      </>,
-      root
-    );
-  });
+	pullPlaybackInfo().then(res => initial.playback = res),
+	pullQueueInfo().then(res => initial.queue = res),
+	fetch("/go/channels").then(res => res.json()).then(res => initial.channels = res),
+]).then(() =>
+	ReactDOM.render(
+		<MpdStateProvider initial={initial}><Root/></MpdStateProvider>, document.getElementById("root")
+	)
+);

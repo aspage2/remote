@@ -41,8 +41,8 @@ export default function MPDConsole() {
       <div className={globalStyles.divider} />
       <p className={styles.monospace}>{mpdCommand || "\u00A0"}</p>
       <div className={styles.mpdResults}>
-        {map(mpdResult.split("\n"), (line) => (
-          <div>{line}</div>
+        {map(mpdResult.split("\n"), (line, i) => (
+          <div key={i}>{line}</div>
         ))}
       </div>
     </>
