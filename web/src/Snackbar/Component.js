@@ -1,13 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 
 import classnames from "classnames";
 
 import styles from "./Style.scss";
+import { SnackbarContext } from "./Context";
 
 /**
  * Sits at the top right of the screen and displays messages
  */
-export function Snackbar({ message, hideSnackbar, shown }) {
+export default function Snackbar() {
+	const { snackbar, hideSnackbar } = useContext(SnackbarContext);
+	const { shown, message } = snackbar;
+
   const className = classnames(styles.card, { [styles.shown]: shown });
   const timeoutRef = useRef(0);
   useEffect(() => {

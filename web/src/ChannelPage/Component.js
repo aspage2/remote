@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import map from "lodash/map";
 import includes from "lodash/includes";
@@ -7,9 +7,14 @@ import styles from "./Style.scss";
 
 import classnames from "classnames";
 import ToggleButton from "../ToggleButton";
+import { ChannelContext } from "./Context";
+import { SnackbarContext } from "../Snackbar/Context";
 
-export default function ChannelPage(props) {
-  const { channels, putChannels, putSnackbarMessage } = props;
+export default function ChannelPage() {
+
+	const { channels, setChannels } = useContext(ChannelContext);
+	const { showSnackbar } = useContext(SnackbarContext);
+
   const currChannels = channels.active;
 
   async function setChannel(chan) {
@@ -29,7 +34,7 @@ export default function ChannelPage(props) {
 			return
 		}
 		const data = await resp.json();
-		putChannels(data);
+		setChannels(data);
   };
   async function sysOff() {
     const response = await fetch("/go/channels", {
@@ -40,10 +45,10 @@ export default function ChannelPage(props) {
 			body: `{"action": "sys_off"}`, 
     });
 		if (!response.ok) {
-			putSnackbarMessage(await response.text());
+			showSnackbar(await response.text());
 			return;
 		}
-		putChannels(await response.json());
+		setChannels(await response.json());
   };
 
   return (

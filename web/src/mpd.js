@@ -3,9 +3,6 @@
  */
 
 import { Actions as PlaybackActions } from "./PlaybackControls";
-import { Actions as QueueActions } from "./Queue";
-import { Actions as SnackbarActions } from "./Snackbar";
-import { Actions as GlobalActions } from "./Ducks";
 
 export async function mpdQuery(command) {
   const resp = await fetch(`/go/cmd?q=${encodeURIComponent(command)}`);
@@ -84,6 +81,10 @@ export function pullPlaybackInfo() {
   });
 }
 
+export function isDBUpdating({ db_updating }) {
+	return !(db_updating === null || db_updating == undefined);
+}
+
 const STATUS_UPDATE_TYPES = [
   "playlist",
   "player",
@@ -95,34 +96,22 @@ const STATUS_UPDATE_TYPES = [
 const PLAYLIST_UPDATE_TYPES = ["playlist"];
 const DB_UPDATE_TYPES = ["update"];
 
-export function startMpdWatcher(dispatch) {
+export function startMpdWatcher(setConnection, setPlayback, setQueue, showSnackbar) {
   const es = new EventSource("/go/events");
-
-  es.onerror = () => {
-		dispatch(GlobalActions.setConnection(false));
-	};
-
-	es.onopen = () => {
-		dispatch(GlobalActions.setConnection(true));
-	};
-
-	es.addEventListener("ping", () => {
-		dispatch(GlobalActions.setConnection(true));
-	});
-  
+  es.onerror = () => setConnection(false);
+	es.onopen = () => setConnection(true); 
+	es.addEventListener("ping", () => setConnection(true));
   es.onmessage = function (ev) {
-		dispatch(GlobalActions.setConnection(true));
+		setConnection(true);
     const changed = ev.data;
     if (STATUS_UPDATE_TYPES.includes(changed)) {
-      pullPlaybackInfo().then((pb) =>
-        dispatch(PlaybackActions.setPlayback(pb))
-      );
+      pullPlaybackInfo().then(setPlayback);
     }
     if (PLAYLIST_UPDATE_TYPES.includes(changed)) {
-      pullQueueInfo().then((q) => dispatch(QueueActions.setQueue(q)));
+      pullQueueInfo().then(setQueue);
     }
     if (DB_UPDATE_TYPES.includes(changed)) {
-      dispatch(SnackbarActions.showSnackbar("database update"));
-    }
+      showSnackbar("database update");
+		}
   };
 }

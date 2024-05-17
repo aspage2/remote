@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import urls from "../urls";
 import { englishTimeStr } from "../utils";
 import { useHttpGet, useMPDQuery } from "../hooks";
 import classNames from "classnames";
 import styles from "./Styles.scss";
 import globalStyles from "../Global.scss";
-import { mpdQuery, objFromData } from "../mpd";
+import { isDBUpdating, mpdQuery, objFromData } from "../mpd";
 import { Link } from "react-router-dom";
+import { PlaybackContext } from "../PlaybackControls/Context";
 
 const SiteStats = (stats) => {
   const date = new Date(0);
@@ -64,7 +65,7 @@ const SiteStats = (stats) => {
 };
 
 
-export default function StatusPage(props) {
+export default function StatusPage() {
   const { data, loaded, err } = useMPDQuery("stats");
   const verStat = useHttpGet("/go/mpd/version");
   if (!loaded || !verStat.loaded) {
@@ -74,7 +75,9 @@ export default function StatusPage(props) {
     return <h3>Can't get statistics.</h3>;
   }
   const stats = objFromData(data);
-  const updating = props.isUpdating;
+
+	const { playback } = useContext(PlaybackContext);
+  const updating = isDBUpdating(playback);
 
   return (
     <React.Fragment>

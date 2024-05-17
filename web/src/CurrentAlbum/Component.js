@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import urls from "../urls";
 
 import styles from "./Style.scss";
+import { PlaybackContext } from "../PlaybackControls/Context";
+import { QueueContext } from "../Queue/Context";
 
-export default function CurrentAlbum(props) {
+export default function CurrentAlbum({ cls }) {
   const [err, setErr] = React.useState(false);
 
-  const { playback, queue, cls } = props;
+	const { playback } = useContext(PlaybackContext);
+	const { queue } = useContext(QueueContext);
 
   if (!playback.hasOwnProperty("song")) return <div className={styles.err} />;
 

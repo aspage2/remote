@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { timeStr } from "../utils";
 import { useMPDQuery } from "../hooks";
 import urls from "../urls";
@@ -14,6 +14,8 @@ import isEmpty from "lodash/isEmpty";
 import styles from "./Style.scss";
 import { mpdQuery, tracksFromData } from "../mpd";
 
+import { SnackbarContext } from "../Snackbar/Context";
+
 // mostCommonValue returns the value which makes up the majority of
 // items in a set.
 function mostCommonValue(l, k) {
@@ -24,7 +26,8 @@ function mostCommonValue(l, k) {
 	return maxBy(toPairs(counts), ([_, c]) => c);
 };
 
-export default function AlbumPage({ album, albumartist, showMessage }) {
+export default function AlbumPage({ album, albumartist }) {
+	const { showSnackbar } = useContext(SnackbarContext);
   const { loaded, err, data } = useMPDQuery(
     `find albumartist "${albumartist}" album "${album}"`
   );
@@ -48,12 +51,12 @@ export default function AlbumPage({ album, albumartist, showMessage }) {
 
   const albumAdd = () =>
     mpdQuery(`findadd album "${album}" albumartist "${albumartist}"`).then(() =>
-      showMessage("Album added")
+      showSnackbar("Album added")
     );
   const trackAdd = (track) =>
     mpdQuery(
       `findadd album "${album}" albumartist "${albumartist}" track ${track}`
-    ).then(() => showMessage("Track added"));
+    ).then(() => showSnackbar("Track added"));
 
   return (
     <React.Fragment>

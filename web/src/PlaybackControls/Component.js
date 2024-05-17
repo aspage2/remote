@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import isEmpty from "lodash/isEmpty";
 import isNaN from "lodash/isNaN";
@@ -12,6 +12,8 @@ import NextIcon from "../icons/next.svg";
 import PlayIcon from "../icons/play.svg";
 import PauseIcon from "../icons/pause.svg";
 import { mpdQuery } from "../mpd";
+import { QueueContext } from "../Queue/Context";
+import { PlaybackContext } from "./Context";
 
 const buttonIconDim = {
   height: "70",
@@ -76,7 +78,10 @@ function ProgressBar({ elapsed, duration }) {
   );
 }
 
-export default function PlaybackControls({ queue, playback }) {
+export default function PlaybackControls() {
+	const { queue } = useContext(QueueContext);
+	const { playback } = useContext(PlaybackContext);
+
   const { state, song } = playback;
   const sendCmd = (cmd) => mpdQuery(cmd);
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import partial from "lodash/partial";
 import sortBy from "lodash/sortBy";
@@ -9,7 +9,13 @@ import { mpdQuery } from "../mpd";
 
 import styles from "./Style.scss";
 
-export default function QueuePage({ queue, playback }) {
+import { QueueContext } from "./Context";
+import { PlaybackContext } from "../PlaybackControls/Context";
+
+export default function QueuePage() {
+	const { queue } = useContext(QueueContext);
+	const { playback } = useContext(PlaybackContext);
+
   if (!queue) return <h3>Loading...</h3>;
 
   const tracks = sortBy(queue, (track) => parseInt(track.pos || "10000"));
