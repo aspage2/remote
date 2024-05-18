@@ -27,6 +27,8 @@ function mostCommonValue(l, k) {
 }
 
 export default function AlbumPage({ album, albumartist }) {
+  album = decodeURIComponent(album);
+  albumartist = decodeURIComponent(albumartist);
   const { showSnackbar } = useContext(SnackbarContext);
   const { loaded, err, data } = useMPDQuery(
     `find albumartist "${albumartist}" album "${album}"`
