@@ -1,22 +1,12 @@
-import React, { useState, createContext, useEffect } from "react";
-
-const InitialChannelState = {
-	active: [],
-	channels: [],
-};
+import React, { useState, createContext } from "react";
 
 export const ChannelContext = createContext({
-	channels: InitialChannelState,
+	channels: null,
 	setChannels: _ => {},
 });
 
 export function ChannelProvider({ initial, children }) {
 	const [channels, setChannels] = useState(initial);
-	useEffect(() => {
-		fetch("/go/channels")
-			.then(res => res.json())
-			.then(setChannels)
-	}, []);
 	return <ChannelContext.Provider value={{channels, setChannels}}>
 		{ children }
 	</ChannelContext.Provider>

@@ -3,16 +3,16 @@ import { startMpdWatcher } from "./mpd";
 
 import App from "./App";
 import ReactDOM from "react-dom";
-import { MpdStateProvider } from "./context";
 
 import "./Global.scss";
 
-import { SnackbarContext } from "./Snackbar/Context";
-import { ConnectionContext } from "./App/Context";
-import { QueueContext } from "./Queue/Context";
-import { PlaybackContext } from "./PlaybackControls/Context";
+import { SnackbarContext, SnackbarProvider } from "./Snackbar/Context";
+import { ConnectionContext, ConnectionProvider } from "./App/Context";
+import { QueueContext, QueueProvider } from "./Queue/Context";
+import { PlaybackContext, PlaybackProvider } from "./PlaybackControls/Context";
 
 import { pullPlaybackInfo, pullQueueInfo } from "./mpd";
+import { ChannelProvider } from "./ChannelPage/Context";
 
 function Root() {
 	const { setConnected } = useContext(ConnectionContext);
@@ -32,13 +32,22 @@ function Root() {
 
 	return <App />
 }
-let initial = {};
-Promise.all([
-	pullPlaybackInfo().then(res => initial.playback = res),
-	pullQueueInfo().then(res => initial.queue = res),
-	fetch("/go/channels").then(res => res.json()).then(res => initial.channels = res),
-]).then(() =>
+async function start() {
+	const playback = await pullPlaybackInfo();
+	const queue = await pullQueueInfo();
+	const channels = await fetch("/go/channels").then(res => res.json());
 	ReactDOM.render(
-		<MpdStateProvider initial={initial}><Root/></MpdStateProvider>, document.getElementById("root")
+		<PlaybackProvider initial={playback}>
+		<QueueProvider initial={queue}>
+		<ChannelProvider initial={channels}>
+		<SnackbarProvider>
+		<ConnectionProvider>
+		<Root/> 
+		</ConnectionProvider>
+		</SnackbarProvider>
+		</ChannelProvider>
+		</QueueProvider>
+		</PlaybackProvider>, document.getElementById("root")
 	)
-);
+}
+start();
