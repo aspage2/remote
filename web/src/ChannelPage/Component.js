@@ -30,7 +30,7 @@ export default function ChannelPage() {
       body: JSON.stringify(req),
     });
 		if (!resp.ok) {
-			putSnackbarMessage(await resp.text());
+			showSnackbar(await resp.text());
 			return
 		}
 		const data = await resp.json();

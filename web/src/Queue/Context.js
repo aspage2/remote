@@ -1,18 +1,12 @@
-import React, { useState, useEffect, createContext } from "react";
-import { pullQueueInfo } from "../mpd";
-
-const InitialQueue = [];
+import React, { useState, createContext } from "react";
 
 export const QueueContext = createContext({
-	queue: InitialQueue, 
+	queue: [], 
 	setQueue: _ => {}
 });
 
 export function QueueProvider({ initial, children }) {
 	const [queue, setQueue] = useState(initial);
-	useEffect(() => {
-		pullQueueInfo().then(setQueue);
-	}, []);
 	return <QueueContext.Provider value={{queue, setQueue}}>
 		{ children }
 	</QueueContext.Provider>

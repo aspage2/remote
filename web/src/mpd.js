@@ -2,8 +2,6 @@
  * Utilities issuing MPD commands/queries via `/ws/mpd/command`
  */
 
-import { Actions as PlaybackActions } from "./PlaybackControls";
-
 export async function mpdQuery(command) {
   const resp = await fetch(`/go/cmd?q=${encodeURIComponent(command)}`);
   return await resp.text();
