@@ -1,4 +1,3 @@
-
 /**
  * Convert seconds to a formatted song duration
  * @param t

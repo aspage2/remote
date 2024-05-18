@@ -80,7 +80,7 @@ export function pullPlaybackInfo() {
 }
 
 export function isDBUpdating({ db_updating }) {
-	return !(db_updating === null || db_updating == undefined);
+  return !(db_updating === null || db_updating == undefined);
 }
 
 const STATUS_UPDATE_TYPES = [
@@ -94,13 +94,18 @@ const STATUS_UPDATE_TYPES = [
 const PLAYLIST_UPDATE_TYPES = ["playlist"];
 const DB_UPDATE_TYPES = ["update"];
 
-export function startMpdWatcher(setConnection, setPlayback, setQueue, showSnackbar) {
+export function startMpdWatcher(
+  setConnection,
+  setPlayback,
+  setQueue,
+  showSnackbar
+) {
   const es = new EventSource("/go/events");
   es.onerror = () => setConnection(false);
-	es.onopen = () => setConnection(true); 
-	es.addEventListener("ping", () => setConnection(true));
+  es.onopen = () => setConnection(true);
+  es.addEventListener("ping", () => setConnection(true));
   es.onmessage = function (ev) {
-		setConnection(true);
+    setConnection(true);
     const changed = ev.data;
     if (STATUS_UPDATE_TYPES.includes(changed)) {
       pullPlaybackInfo().then(setPlayback);
@@ -110,6 +115,6 @@ export function startMpdWatcher(setConnection, setPlayback, setQueue, showSnackb
     }
     if (DB_UPDATE_TYPES.includes(changed)) {
       showSnackbar("database update");
-		}
+    }
   };
 }

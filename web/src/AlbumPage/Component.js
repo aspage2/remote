@@ -19,15 +19,15 @@ import { SnackbarContext } from "../Snackbar/Context";
 // mostCommonValue returns the value which makes up the majority of
 // items in a set.
 function mostCommonValue(l, k) {
-	if (isEmpty(l)) {
-		return [undefined, undefined];
-	}
-	const counts = countBy(l, k);
-	return maxBy(toPairs(counts), ([_, c]) => c);
-};
+  if (isEmpty(l)) {
+    return [undefined, undefined];
+  }
+  const counts = countBy(l, k);
+  return maxBy(toPairs(counts), ([_, c]) => c);
+}
 
 export default function AlbumPage({ album, albumartist }) {
-	const { showSnackbar } = useContext(SnackbarContext);
+  const { showSnackbar } = useContext(SnackbarContext);
   const { loaded, err, data } = useMPDQuery(
     `find albumartist "${albumartist}" album "${album}"`
   );

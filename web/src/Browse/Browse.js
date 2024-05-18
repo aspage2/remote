@@ -21,7 +21,7 @@ function GenreList() {
       <div className={styles.list}>
         {map(Array.from(parsePairs(data)), ([_, v]) => (
           <div key={v} className={styles.list}>
-            <Link to={urls.browseGenrePage({genre: v})}>{v}</Link>
+            <Link to={urls.browseGenrePage({ genre: v })}>{v}</Link>
           </div>
         ))}
       </div>
@@ -47,7 +47,7 @@ function GenrePage(props) {
       <div className={styles.list}>
         {map(Array.from(parsePairs(data)), ([_, v]) => (
           <div key={v}>
-            <Link to={urls.artistPage({artist: v})}>{v}</Link>
+            <Link to={urls.artistPage({ artist: v })}>{v}</Link>
           </div>
         ))}
       </div>

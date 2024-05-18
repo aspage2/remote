@@ -13,8 +13,8 @@ import { QueueContext } from "./Context";
 import { PlaybackContext } from "../PlaybackControls/Context";
 
 export default function QueuePage() {
-	const { queue } = useContext(QueueContext);
-	const { playback } = useContext(PlaybackContext);
+  const { queue } = useContext(QueueContext);
+  const { playback } = useContext(PlaybackContext);
 
   if (!queue) return <h3>Loading...</h3>;
 

@@ -79,8 +79,8 @@ function ProgressBar({ elapsed, duration }) {
 }
 
 export default function PlaybackControls() {
-	const { queue } = useContext(QueueContext);
-	const { playback } = useContext(PlaybackContext);
+  const { queue } = useContext(QueueContext);
+  const { playback } = useContext(PlaybackContext);
 
   const { state, song } = playback;
   const sendCmd = (cmd) => mpdQuery(cmd);
@@ -100,7 +100,8 @@ export default function PlaybackControls() {
   }
   const { album, title, artist } =
     (!isEmpty(song) &&
-    find(queue || [], ({ pos }) => String(pos) === String(song))) || {};
+      find(queue || [], ({ pos }) => String(pos) === String(song))) ||
+    {};
 
   return (
     <div className={styles.root}>
