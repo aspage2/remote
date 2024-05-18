@@ -25,15 +25,17 @@ import { QueueContext } from "../Queue/Context";
 import { PlaybackContext } from "../PlaybackControls/Context";
 
 export default function App() {
-  const smallScreen = useMediaQuery({query: "(max-width: 800px)"});
+  const smallScreen = useMediaQuery({ query: "(max-width: 800px)" });
 
   const [drawerOpen, setDrawer] = useState(false);
 
-	const { connected } = useContext(ConnectionContext);
-	const { playback } = useContext(PlaybackContext);
-	const { queue: {length: queueCount} } = useContext(QueueContext);
+  const { connected } = useContext(ConnectionContext);
+  const { playback } = useContext(PlaybackContext);
+  const {
+    queue: { length: queueCount },
+  } = useContext(QueueContext);
 
-	const dbUpdating = isDBUpdating(playback);
+  const dbUpdating = isDBUpdating(playback);
 
   const Nav = () => {
     const cn = classnames({
@@ -57,9 +59,7 @@ export default function App() {
             Queue {queueCount ? ` (${queueCount})` : ""}
           </Link_>
           <Link_ to="/web/channels">Channels</Link_>
-          <Link_ to="/web/stats">
-            Settings {dbUpdating ? " (U)" : ""}
-          </Link_>
+          <Link_ to="/web/stats">Settings {dbUpdating ? " (U)" : ""}</Link_>
           <div
             className={styles.noConnection}
             style={{ display: connected ? "none" : "block" }}
@@ -76,7 +76,6 @@ export default function App() {
     viewBox: "0 150 250 250",
   };
   return (
-
     <BrowserRouter>
       <div id={styles["app-root"]}>
         <div id={styles["browser-root"]}>

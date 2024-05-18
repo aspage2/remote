@@ -11,9 +11,8 @@ import { ChannelContext } from "./Context";
 import { SnackbarContext } from "../Snackbar/Context";
 
 export default function ChannelPage() {
-
-	const { channels, setChannels } = useContext(ChannelContext);
-	const { showSnackbar } = useContext(SnackbarContext);
+  const { channels, setChannels } = useContext(ChannelContext);
+  const { showSnackbar } = useContext(SnackbarContext);
 
   const currChannels = channels.active;
 
@@ -29,27 +28,27 @@ export default function ChannelPage() {
       },
       body: JSON.stringify(req),
     });
-		if (!resp.ok) {
-			showSnackbar(await resp.text());
-			return
-		}
-		const data = await resp.json();
-		setChannels(data);
-  };
+    if (!resp.ok) {
+      showSnackbar(await resp.text());
+      return;
+    }
+    const data = await resp.json();
+    setChannels(data);
+  }
   async function sysOff() {
     const response = await fetch("/go/channels", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-			body: `{"action": "sys_off"}`, 
+      body: `{"action": "sys_off"}`,
     });
-		if (!response.ok) {
-			showSnackbar(await response.text());
-			return;
-		}
-		setChannels(await response.json());
-  };
+    if (!response.ok) {
+      showSnackbar(await response.text());
+      return;
+    }
+    setChannels(await response.json());
+  }
 
   return (
     <React.Fragment>
@@ -77,4 +76,3 @@ export default function ChannelPage() {
     </React.Fragment>
   );
 }
-

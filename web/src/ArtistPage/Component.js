@@ -28,7 +28,12 @@ export default function ArtistPage(props) {
             info={album}
             hideDetails={!show}
             onClick={() =>
-              history.push(urls.albumPage({albumartist: album.albumartist, album: album.album}))
+              history.push(
+                urls.albumPage({
+                  albumartist: album.albumartist,
+                  album: album.album,
+                })
+              )
             }
           />
         ))}

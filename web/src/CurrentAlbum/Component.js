@@ -9,8 +9,8 @@ import { QueueContext } from "../Queue/Context";
 export default function CurrentAlbum({ cls }) {
   const [err, setErr] = React.useState(false);
 
-	const { playback } = useContext(PlaybackContext);
-	const { queue } = useContext(QueueContext);
+  const { playback } = useContext(PlaybackContext);
+  const { queue } = useContext(QueueContext);
 
   if (!playback.hasOwnProperty("song")) return <div className={styles.err} />;
 

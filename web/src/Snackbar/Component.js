@@ -9,8 +9,8 @@ import { SnackbarContext } from "./Context";
  * Sits at the top right of the screen and displays messages
  */
 export default function Snackbar() {
-	const { snackbar, hideSnackbar } = useContext(SnackbarContext);
-	const { shown, message } = snackbar;
+  const { snackbar, hideSnackbar } = useContext(SnackbarContext);
+  const { shown, message } = snackbar;
 
   const className = classnames(styles.card, { [styles.shown]: shown });
   const timeoutRef = useRef(0);

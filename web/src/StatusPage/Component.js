@@ -64,7 +64,6 @@ const SiteStats = (stats) => {
   );
 };
 
-
 export default function StatusPage() {
   const { data, loaded, err } = useMPDQuery("stats");
   const verStat = useHttpGet("/go/mpd/version");
@@ -76,7 +75,7 @@ export default function StatusPage() {
   }
   const stats = objFromData(data);
 
-	const { playback } = useContext(PlaybackContext);
+  const { playback } = useContext(PlaybackContext);
   const updating = isDBUpdating(playback);
 
   return (

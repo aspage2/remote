@@ -114,7 +114,7 @@ export default function Search({ history, location }) {
               <div
                 key={i}
                 className={styles.item}
-                onClick={() => history.push(urls.artistPage({artist}))}
+                onClick={() => history.push(urls.artistPage({ artist }))}
               >
                 {artist}
               </div>
@@ -127,8 +127,8 @@ export default function Search({ history, location }) {
                 key={i}
                 album={album}
                 albumartist={albumartist}
-                onClick={() => 
-                  history.push(urls.albumPage({albumartist, album}))
+                onClick={() =>
+                  history.push(urls.albumPage({ albumartist, album }))
                 }
               />
             ))}
@@ -143,10 +143,14 @@ export default function Search({ history, location }) {
                   title={title}
                   album={album}
                   artist={artist}
-									onClick={() => 
-										history.push(urls.albumPage({albumartist, album}))
-									}
-                  add={() => mpdQuery(`findadd album "${album}" albumartist "${albumartist}" track "${track}"`)}
+                  onClick={() =>
+                    history.push(urls.albumPage({ albumartist, album }))
+                  }
+                  add={() =>
+                    mpdQuery(
+                      `findadd album "${album}" albumartist "${albumartist}" track "${track}"`
+                    )
+                  }
                 />
               )
             )}

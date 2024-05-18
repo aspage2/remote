@@ -1,29 +1,31 @@
-
 import { mpdQuery } from "./mpd";
 import { useEffect, useState } from "react";
 
 function useLoadState() {
-	const orig = {
-		loaded: false,
-		err: false,
-		data: null,
-	};
-	const [loadState, setLoadState] = useState(orig);
+  const orig = {
+    loaded: false,
+    err: false,
+    data: null,
+  };
+  const [loadState, setLoadState] = useState(orig);
 
-	return [
-		loadState,
-		d => setLoadState({loaded: true, err: false, data: d}),
-		e => setLoadState({loaded: true, err: true, data: e}),
-		() => setLoadState(orig),
-	];
+  return [
+    loadState,
+    (d) => setLoadState({ loaded: true, err: false, data: d }),
+    (e) => setLoadState({ loaded: true, err: true, data: e }),
+    () => setLoadState(orig),
+  ];
 }
 
 export function useHttpGet(path) {
   const [status, success, err, reset] = useLoadState();
 
   useEffect(() => {
-		reset();
-    fetch(path).then(res => res.json()).then(success).catch(err);
+    reset();
+    fetch(path)
+      .then((res) => res.json())
+      .then(success)
+      .catch(err);
   }, [path]);
 
   return status;
@@ -35,15 +37,14 @@ export function useHttpGet(path) {
  * @returns {{loaded: boolean, err: boolean, data: *}}
  */
 export function useMPDQuery(cmd) {
-	const [ls, success, err, reset] = useLoadState();
+  const [ls, success, err, reset] = useLoadState();
 
   useEffect(() => {
     if (cmd !== "") {
-			reset();
+      reset();
       mpdQuery(cmd).then(success).catch(err);
     }
   }, [cmd]);
 
   return ls;
-};
-
+}
