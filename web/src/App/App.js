@@ -17,6 +17,7 @@ import StatsPage from "../StatusPage";
 import MPDConsole from "../MPDConsole/Component";
 import { isDBUpdating, mpdQuery } from "../mpd";
 import { useMediaQuery } from "react-responsive";
+import FunPage from "../Fun";
 import NavButton from "../NavButton";
 import VolDown from "../icons/vol_down.svg";
 import VolUp from "../icons/vol_up.svg";
@@ -105,6 +106,7 @@ export default function App() {
             <Route path="/web/search" component={Search} />
             <Route path="/web/browse" component={Browse} />
             <Route path="/web/channels" component={ChannelPage} />
+						<Route path="/web/fun" component={FunPage} />
             <Route
               path="/web/artist/:artist"
               render={({ match, history }) => (

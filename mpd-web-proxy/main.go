@@ -162,7 +162,7 @@ func httpServer(s *Server) {
 	http.Handle("/go/", loggingMiddleware(&nonEventMux))
 	http.HandleFunc("/go/events", MpdEvents)
 
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(BindAddr, nil)
 }
 
 func Must[T any](t T, err error) T {
@@ -173,7 +173,7 @@ func Must[T any](t T, err error) T {
 }
 
 func main() {
-	ps, pins, err := gpio.ConfigFromYaml("pins.yaml")
+	ps, pins, err := gpio.ConfigFromYaml(PinFile)
 	if err != nil {
 		panic(err)
 	}

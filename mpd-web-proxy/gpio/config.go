@@ -43,9 +43,9 @@ func ConfigFromYaml(fname string) (*PinState, []Pin, error) {
 	}
 
 	pins := make([]Pin, len(cfg.Channels))
+	pinNums := make([]int, len(cfg.Channels))
 
 	var pinState PinState
-	pinState.backend = &NopBackend{}
 	pinState.amp.isActive = false
 	pinState.amp.pin = cfg.Amp.Pin
 	pinState.amp.activeState = globalDefaultHighState
@@ -58,6 +58,7 @@ func ConfigFromYaml(fname string) (*PinState, []Pin, error) {
 	}
 	pinState.pins = make(map[PinId]*pin)
 	for i, c := range cfg.Channels {
+		pinNums[i] = c.Pin
 		p := &pin{
 			pin: c.Pin,
 			isActive: false,
@@ -70,6 +71,10 @@ func ConfigFromYaml(fname string) (*PinState, []Pin, error) {
 
 		pins[i].Desc = c.Desc
 		pins[i].Name = c.Id
+	}
+	pinState.backend, err = InitGPIO(pinNums)
+	if err != nil {
+		return nil, nil, err
 	}
 	return &pinState, pins, nil
 }

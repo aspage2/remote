@@ -25,6 +25,7 @@ type LogicalState bool
 // actual on/off operations of the board. 
 type GPIOBackend interface {
 	Set(int, PhysicalState) error
+	Close() error
 }
 
 type NopBackend struct{}
@@ -38,3 +39,7 @@ func (n *NopBackend) Set(pin int, state PhysicalState) error {
 	return nil
 }
 
+func (n *NopBackend) Close() error {
+	fmt.Println("GPIO Close called")
+	return nil
+}

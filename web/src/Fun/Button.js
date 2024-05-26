@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import styles from "./Style.scss";
+import ListboxSelector from "../DropdownSelector/Component";
 
 function HoldButton(props) {
   const { onActivate, duration } = props;
@@ -56,8 +57,15 @@ export default () => {
     timeoutRef.current = setTimeout(() => setActive(false), 2000);
   }, [active]);
 
+	const [choice, setChoice] = useState(0);
+
   return (
     <div>
+			<ListboxSelector 
+				choices={["Jim", "Joe", "Jackson"]} 
+				handler={setChoice}
+				selected={choice}
+			/>
       <HoldButton onActivate={() => setActive(true)} duration={1000} />
       {(active && <h2>Active</h2>) || <h2>Inactive</h2>}
     </div>
