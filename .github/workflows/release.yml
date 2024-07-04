@@ -1,30 +1,78 @@
-name: Create Release
+
+name: Release
 
 on:
   push:
-    tags: ['*']
+    branches: ['*']
+
+jobs:
+  build-frontend:
+    runs_on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Set Up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 21.x
+
+    - name: Build Frontend
+      working-directory: ./web
+      run: npm i -g yarn && yarn && yarn build
+
+    - name: Collect Artifacts
+      run: tar -czf frontend.tar.gz ./web/dist/* ./web/static/index.html
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-${{ github.ref }}
+        path: ./frontend.tar.gz
+
+  proxy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+
+    - name: Build-Arm
+      working-directory: ./mpd-web-proxy
+      env:
+        GOARCH: arm
+      run: go build -o mpd-web-proxy-arm -v . && gzip mpd-web-proxy-arm
+    
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: proxy-${{ github.ref }}
+        path: ./web/mpd-web-proxy-arm.gz
 
 # -- Release --
-jobs:
-  release:
-    - name: release
-      uses: actions/create-release@v1
-      id: create_release
-      with:
-        draft: false
-        prerelease: false
-        release_name: ${{ github.ref }}
-        tag_name: ${{ github.ref }}
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-
-    - name: upload release artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./mpd-web-proxy/mpd-web-proxy-arm.gz
-        asset_name: mpd-web-proxy-arm.gz
-        asset_content_type: application/gzip
-
+#jobs:
+#  release:
+#    - name: release
+#      uses: actions/create-release@v1
+#      id: create_release
+#      with:
+#        draft: false
+#        prerelease: false
+#        release_name: ${{ github.ref }}
+#        tag_name: ${{ github.ref }}
+#      env:
+#        GITHUB_TOKEN: ${{ github.token }}
+#
+#    - name: upload release artifact
+#      uses: actions/upload-release-asset@v1
+#      env:
+#        GITHUB_TOKEN: ${{ github.token }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        asset_path: ./mpd-web-proxy/mpd-web-proxy-arm.gz
+#        asset_name: mpd-web-proxy-arm.gz
+#        asset_content_type: application/gzip
+#
