@@ -23,10 +23,10 @@ jobs:
 
     - name: Build-Amd64
       working-directory: ./mpd-web-proxy
-      run: go build -o mpd-web-proxy-amd64 -v ./...
+      run: go build -o mpd-web-proxy-amd64 -v .
 
     - name: Build-Arm
       working-directory: ./mpd-web-proxy
       env:
         GOARCH: arm
-      run: go build -o mpd-web-proxy-arm -v ./...
+      run: go build -o mpd-web-proxy-arm -v .
