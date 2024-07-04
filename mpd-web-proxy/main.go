@@ -2,14 +2,19 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net"
 	"net/http"
+	"os"
+	"path"
 	"strings"
 
+	"github.com/aspage2/remote/mpd-web-proxy/art"
 	"github.com/aspage2/remote/mpd-web-proxy/gpio"
 )
 
@@ -153,11 +158,59 @@ func MpdVersion(rw http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(rw).Encode(&payload)
 }
 
+func chooseAFile(sc *bufio.Scanner) (string, error) {
+	for sc.Scan() {
+		line := strings.TrimSpace(sc.Text())
+		if line == "OK" {
+			return "", errors.New("no file label. how???")
+		}
+		parts := strings.Split(line, ": ")
+		if len(parts) == 2 && parts[0] == "file" {
+			return parts[1], nil
+		}
+	}
+	return "", sc.Err()
+}
+
+func AlbumArt(rw http.ResponseWriter, req *http.Request) {
+	conn := Must(net.Dial("tcp", MpdAuthority))
+	defer conn.Close()
+
+	sc := bufio.NewScanner(conn)
+	sc.Scan() // MPD header
+	if sc.Err() != nil {
+		panic(sc.Err())
+	}
+	Must(fmt.Fprintf(conn, "search albumartist \"%s\" album \"%s\"\n", req.PathValue("albumartist"), req.PathValue("album")))
+	fname := Must(chooseAFile(sc))
+	fullPath := path.Join(MusicDir, fname)
+	fullDir, _ := path.Split(fullPath)
+	img, err := art.FindFolderImage(fullDir)
+	if err != nil {
+		panic(err)
+	}
+	if img != "" {
+		fmt.Println("found file:", img)
+		rw.Header().Set("Content-Type", "image/jpeg")
+		f := Must(os.Open(img))
+		io.Copy(rw, f)
+		return
+	}
+	mime, data, err := art.FindAPICInMP3(fullPath)
+	if err != nil {
+		rw.WriteHeader(404)
+		return
+	}
+	rw.Header().Set("Content-Type", mime)
+	io.Copy(rw, bytes.NewReader(data))
+}
+
 func httpServer(s *Server) {
 	var nonEventMux http.ServeMux
 	nonEventMux.HandleFunc("/go/cmd", MpdCommand)
 	nonEventMux.HandleFunc("/go/mpd/version", MpdVersion)
 	nonEventMux.HandleFunc("/go/channels", s.Channels)
+	nonEventMux.HandleFunc("/go/art/{albumartist}/{album}", AlbumArt)
 
 	http.Handle("/go/", loggingMiddleware(&nonEventMux))
 	http.HandleFunc("/go/events", MpdEvents)

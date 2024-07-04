@@ -6,6 +6,7 @@ var (
 	MpdAuthority string
 	PinFile string
 	BindAddr string
+	MusicDir string
 )
 
 func init() {
@@ -22,5 +23,10 @@ func init() {
 	BindAddr = os.Getenv("PROXY_BIND_ADDR")
 	if BindAddr == "" {
 		BindAddr = ":8000"
+	}
+
+	MusicDir = os.Getenv("PROXY_MUSIC_DIR")
+	if MusicDir == "" {
+		MusicDir = "/data/music"
 	}
 }
