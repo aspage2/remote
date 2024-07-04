@@ -20,8 +20,11 @@ services:
     build: mpd-web-proxy/
     environment:
       MPD_AUTHORITY: mpd:6600
+      PROXY_PIN_FILE: /app/pins.yaml
+      PROXY_MUSIC_DIR: /var/lib/mpd/music
     volumes:
       - ./mpd-web-proxy/pins.yaml:/app/pins.yaml
+      - ./fake_mpd/music:/var/lib/mpd/music
     ports:
       - 8000
   nginx:

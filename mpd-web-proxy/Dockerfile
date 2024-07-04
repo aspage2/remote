@@ -4,9 +4,10 @@ EXPOSE 8000
 
 WORKDIR /app
 
+COPY go.mod go.sum ./
 COPY *.go ./
 COPY gpio/ ./gpio/
-COPY go.mod go.sum ./
+COPY art/ ./art/
 
 RUN go build -o /app/main
 
