@@ -1,6 +1,6 @@
 export default {
   albumArtUrl: ({ albumartist, album }) =>
-    `/art/${encodeURIComponent(albumartist)}/${encodeURIComponent(album)}`,
+    `/go/art/${encodeURIComponent(albumartist)}/${encodeURIComponent(album)}`,
 
   // pages
   albumPage: ({ albumartist, album }) =>
