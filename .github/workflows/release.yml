@@ -27,7 +27,7 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: frontend-${{ github.ref }}
+        name: frontend
         path: ./frontend.tar.gz
 
   proxy:
@@ -49,30 +49,42 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: proxy-${{ github.ref }}
+        name: proxy
         path: ./mpd-web-proxy/mpd-web-proxy-arm.gz
 
 # -- Release --
-#jobs:
-#  release:
-#    - name: release
-#      uses: actions/create-release@v1
-#      id: create_release
-#      with:
-#        draft: false
-#        prerelease: false
-#        release_name: ${{ github.ref }}
-#        tag_name: ${{ github.ref }}
-#      env:
-#        GITHUB_TOKEN: ${{ github.token }}
-#
-#    - name: upload release artifact
-#      uses: actions/upload-release-asset@v1
-#      env:
-#        GITHUB_TOKEN: ${{ github.token }}
-#      with:
-#        upload_url: ${{ steps.create_release.outputs.upload_url }}
-#        asset_path: ./mpd-web-proxy/mpd-web-proxy-arm.gz
-#        asset_name: mpd-web-proxy-arm.gz
-#        asset_content_type: application/gzip
-#
+jobs:
+  release:
+    - uses: actions/download-artifact@v4
+
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ github.ref }}
+        tag_name: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: upload proxy
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./mpd-web-proxy/mpd-web-proxy-arm.gz
+        asset_name: mpd-web-proxy-arm.gz
+        asset_content_type: application/gzip
+
+    - name: upload frontend
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./frontend.tar.gz
+        asset_name: frontend.tar.gz
+        asset_content_type: application/gzip
+
