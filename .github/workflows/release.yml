@@ -76,7 +76,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./mpd-web-proxy-arm.gz
+        asset_path: ./proxy/mpd-web-proxy-arm.gz
         asset_name: mpd-web-proxy-arm.gz
         asset_content_type: application/gzip
 
@@ -86,7 +86,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./frontend.tar.gz
+        asset_path: ./frontend/frontend.tar.gz
         asset_name: frontend.tar.gz
         asset_content_type: application/gzip
 
