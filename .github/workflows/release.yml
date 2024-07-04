@@ -50,7 +50,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: proxy-${{ github.ref }}
-        path: ./web/mpd-web-proxy-arm.gz
+        path: ./mpd-web-proxy/mpd-web-proxy-arm.gz
 
 # -- Release --
 #jobs:

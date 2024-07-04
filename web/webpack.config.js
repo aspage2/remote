@@ -1,4 +1,3 @@
-const BundlePlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const TerserPlugin = require("terser-webpack-plugin");
 const path = require("path");
 
@@ -8,9 +7,6 @@ module.exports = {
     filename: "remote.js",
     path: path.join(__dirname, "dist"),
   },
-  plugins: [
-    new BundlePlugin({openAnalyzer: false}),
-  ],
   optimization: {
     minimizer: [new TerserPlugin()],
   },
