@@ -7,15 +7,6 @@ services:
       - ./fake_mpd/playlists:/var/lib/mpd/playlists
     ports:
       - 6600:6600 # MPD protocol
-  art:
-    build: art/
-    environment:
-      MPD_HOST: mpd
-    volumes:
-      - ./fake_mpd/music:/data/music
-      - ./fake_mpd/store:/data/store
-    ports:
-      - 80
   proxy:
     build: mpd-web-proxy/
     environment:
