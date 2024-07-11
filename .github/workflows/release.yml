@@ -44,6 +44,7 @@ jobs:
       working-directory: ./mpd-web-proxy
       env:
         GOARCH: arm
+        GOARM: "6"
       run: go build -o mpd-web-proxy-arm -v . && gzip mpd-web-proxy-arm
     
     - name: Upload Artifacts
