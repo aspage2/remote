@@ -18,6 +18,8 @@ import (
 	"github.com/aspage2/remote/mpd-web-proxy/gpio"
 )
 
+var Version = "dev"
+
 const (
 	ChannelToggle = "toggle"
 	ChannelOn     = "on"
@@ -207,6 +209,9 @@ func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 
 func httpServer(s *Server) {
 	var nonEventMux http.ServeMux
+	nonEventMux.HandleFunc("/go/version", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(struct{Version string `json:"version"`}{Version})
+	})
 	nonEventMux.HandleFunc("/go/cmd", MpdCommand)
 	nonEventMux.HandleFunc("/go/mpd/version", MpdVersion)
 	nonEventMux.HandleFunc("/go/channels", s.Channels)

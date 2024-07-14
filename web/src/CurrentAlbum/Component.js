@@ -12,7 +12,7 @@ export default function CurrentAlbum({ cls }) {
   const { playback } = useContext(PlaybackContext);
   const { queue } = useContext(QueueContext);
 
-  if (!playback.hasOwnProperty("song")) return <div className={styles.err} />;
+  if (!playback.hasOwnProperty("song") || queue.length === 0) return <div className={styles.err} />;
 
   const src = urls.albumArtUrl(queue[parseInt(playback.song)]);
   return err ? (

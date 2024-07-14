@@ -1,12 +1,13 @@
 @import "Vars.scss";
 
-button {
+button, .globalButton {
   border-radius: 5px;
   border: none;
   padding: 5px 8px;
   font-weight: bold;
   color: $color-text-dark;
   background: $color-button;
+  display: inline-block;
 
   svg {
     fill: $color-text-dark;
