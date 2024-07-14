@@ -8,7 +8,10 @@ services:
     ports:
       - 6600:6600 # MPD protocol
   proxy:
-    build: mpd-web-proxy/
+    build: 
+      context: mpd-web-proxy/
+      args:
+        BUILD_VERSION: 
     environment:
       MPD_AUTHORITY: mpd:6600
       PROXY_PIN_FILE: /app/pins.yaml
