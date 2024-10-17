@@ -11,6 +11,9 @@ import (
 	"strings"
 )
 
+// MpdQuery connects and queries the MPD server
+// with the given command. Returns the response body
+// or any connection error.
 func MpdQuery(cmd string) ([]byte, error) {
 	mpd, err := net.Dial("tcp", MpdAuthority)
 	if err != nil {
@@ -20,6 +23,7 @@ func MpdQuery(cmd string) ([]byte, error) {
 	return mpdQuery(cmd, mpd)
 }
 
+// A cancellable MPD Query.
 func MpdQueryContext(cmd string, ctx context.Context) ([]byte, error) {
 	mpd, err := net.Dial("tcp", MpdAuthority)
 	if err != nil {
@@ -33,6 +37,8 @@ func MpdQueryContext(cmd string, ctx context.Context) ([]byte, error) {
 	return mpdQuery(cmd, mpd)
 }
 
+// mpdQuery reads and parses a response stream
+// to verify that the response is valid.
 func mpdQuery(cmd string, mpd io.ReadWriter) ([]byte, error) {
 	scanner := bufio.NewScanner(mpd)
 	if !scanner.Scan() {

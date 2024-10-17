@@ -19,11 +19,15 @@ const (
 	EventTypeMPD
 )
 
-func startChannelListener(mpd net.Conn) chan string {
+// The MPD Idler uses the MPD idle command to receive
+// notifications when the state has changed on the MPD
+// server. It relays what has changed on the returned
+// channel.
+func startMPDIdler(mpd net.Conn) chan string {
 	eventC := make(chan string)
 	go func() {
-		slog.Debug("start channel listener")
-		defer slog.Debug("end channel listener")
+		slog.Debug("start MPD Idler")
+		defer slog.Debug("end MPD Idler")
 		defer close(eventC)
 		sc := bufio.NewScanner(mpd)
 		// MPD Header
@@ -56,11 +60,19 @@ func startChannelListener(mpd net.Conn) chan string {
 	return eventC
 }
 
+// An Event is any asynchronous event 
+// that should be sent to a listening client.
 type Event struct {
 	Type EventType
 	Data string
 }
 
+// getEvents starts a goroutine which emits events
+// to send to the client. Events include:
+//   - any string sent on the provided string channel is sent as an MPDEvent
+//   - the emitter produces a "ping" event that clients can use as a heartbeat.
+// The emitter exits and closes the returned channel when the given context
+// is cancelled.
 func getEvents(ts chan string, ctx context.Context) chan Event {
 	ret := make(chan Event)
 	ticker := time.NewTicker(5 * time.Second)

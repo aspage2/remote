@@ -95,6 +95,13 @@ func WriteBadRequest(rw http.ResponseWriter, msg string) {
 	fmt.Fprintf(rw, "ACK: %s\n", msg)
 }
 
+// Use server-sent events (SSE) to notify the client in
+// real time when the MPD server state has changed. Internally,
+// uses the mpd "idle" command and sends idle values as event
+// data to the client.
+//
+// Additionally, the endpoint will deliver "ping" events on
+// a set interval as a sort of heartbeat.
 func MpdEvents(rw http.ResponseWriter, req *http.Request) {
 	slog.Info(fmt.Sprintf("%s %s", req.RemoteAddr, req.URL))
 	defer slog.Info(fmt.Sprintf("%s %s CLIENT EXIT", req.RemoteAddr, req.URL))
@@ -113,7 +120,7 @@ func MpdEvents(rw http.ResponseWriter, req *http.Request) {
 
 	mpd := Must(net.Dial("tcp", MpdAuthority))
 	defer mpd.Close()
-	events := startChannelListener(mpd)
+	events := startMPDIdler(mpd)
 	for ev := range getEvents(events, req.Context()) {
 		var eventPayload string
 		switch ev.Type {
@@ -134,6 +141,8 @@ func MpdEvents(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// MpdCommand is an endpoint which sends the client query
+// to MPD and returns the MPD response in the HTTP body.
 func MpdCommand(rw http.ResponseWriter, req *http.Request) {
 	qs, ok := req.URL.Query()["q"]
 	if !ok {
@@ -145,6 +154,7 @@ func MpdCommand(rw http.ResponseWriter, req *http.Request) {
 	rw.Write(data)
 }
 
+// Returns the verson of the MPD server being used.
 func MpdVersion(rw http.ResponseWriter, req *http.Request) {
 	conn := Must(net.Dial("tcp", MpdAuthority))
 	defer conn.Close()
@@ -173,6 +183,8 @@ func chooseAFile(sc *bufio.Scanner) (string, error) {
 	return "", sc.Err()
 }
 
+// The AlbumArt endpoint searches in the album directory
+// or the ID3 tags in one of the track files for the album.
 func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 	conn := Must(net.Dial("tcp", MpdAuthority))
 	defer conn.Close()
@@ -206,6 +218,7 @@ func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 	io.Copy(rw, bytes.NewReader(data))
 }
 
+// Build the server.
 func httpServer(s *Server) {
 	var nonEventMux http.ServeMux
 	nonEventMux.HandleFunc("/go/version", func(w http.ResponseWriter, r *http.Request) {
@@ -222,6 +235,7 @@ func httpServer(s *Server) {
 	http.ListenAndServe(BindAddr, nil)
 }
 
+// Panic on any error.
 func Must[T any](t T, err error) T {
 	if err != nil {
 		panic(err)
