@@ -19,10 +19,9 @@ const (
 	EventTypeMPD
 )
 
-// The MPD Idler uses the MPD idle command to receive
-// notifications when the state has changed on the MPD
-// server. It relays what has changed on the returned
-// channel.
+// the MPDIdler continually calls the `idle` MPD 
+// command and sends idle events on the returned 
+// string channel.
 func startMPDIdler(mpd net.Conn) chan string {
 	eventC := make(chan string)
 	go func() {
