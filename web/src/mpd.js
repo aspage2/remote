@@ -79,8 +79,8 @@ export function pullPlaybackInfo() {
   });
 }
 
-export function isDBUpdating({ db_updating }) {
-  return !(db_updating === null || db_updating == undefined);
+export function isDBUpdating({ updating_db }) {
+  return !(updating_db === null || updating_db === undefined);
 }
 
 const STATUS_UPDATE_TYPES = [
