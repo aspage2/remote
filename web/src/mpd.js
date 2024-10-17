@@ -114,6 +114,7 @@ export function startMpdWatcher(
       pullQueueInfo().then(setQueue);
     }
     if (DB_UPDATE_TYPES.includes(changed)) {
+      pullPlaybackInfo().then(setPlayback);
       showSnackbar("database update");
     }
   };
