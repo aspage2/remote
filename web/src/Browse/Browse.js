@@ -34,7 +34,7 @@ function GenrePage(props) {
   const genreName = decodeURIComponent(match.params.genre);
 
   const { loaded, err, data } = useMPDQuery(
-    `list artist genre \"${genreName}\"`
+    `list albumartist genre \"${genreName}\"`
   );
   if (!loaded) return <div />;
   if (err) {
