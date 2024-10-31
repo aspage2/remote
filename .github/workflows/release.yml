@@ -45,7 +45,7 @@ jobs:
       env:
         GOARCH: arm
         GOARM: "6"
-      run: go build -ldflags="-X 'github.com/aspage2/remote/mpd-web-proxy/version.Version=${{ github.event.release.tag_name }}'" -o mpd-web-proxy-arm -v . && gzip mpd-web-proxy-arm
+      run: go build -ldflags="-X 'github.com/aspage2/remote/mpd-web-proxy/version.Version=${{ github.ref_name }}'" -o mpd-web-proxy-arm -v . && gzip mpd-web-proxy-arm
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
