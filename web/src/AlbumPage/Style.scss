@@ -1,13 +1,22 @@
 @import "../Vars";
 
+$line-height: 45px;
+
 .trackItem {
   padding: 6px;
-  height: 45px;
-  line-height: 45px;
+  height: $line-height;
   background: $color-list-item;
   border-radius: 5px;
   margin: 6px 0;
   position: relative;
+
+  > .trackNum {
+    line-height: $line-height;
+  }
+  
+  > .time {
+    line-height: $line-height;
+  }
 
   > * {
     display: inline-block;

@@ -26,6 +26,15 @@ function mostCommonValue(l, k) {
   return maxBy(toPairs(counts), ([_, c]) => c);
 }
 
+function runTimeString(runTime) {
+	const runHours = Math.floor(runTime / 3600);
+	const runMinutes = Math.floor((runTime % 3600) / 60);
+
+	if (runHours > 0)
+		return `${runHours} hr ${runMinutes} min`
+	return `${runMinutes} min`
+}
+
 export default function AlbumPage({ album, albumartist }) {
   album = decodeURIComponent(album);
   albumartist = decodeURIComponent(albumartist);
@@ -44,12 +53,10 @@ export default function AlbumPage({ album, albumartist }) {
 
   // Calculate the duration of this album in hours & minutes
   const runTime = sumBy(tracks, (t) => parseInt(t.time));
-  const runHours = Math.floor(runTime / 3600);
-  const runMinutes = Math.floor((runTime % 3600) / 60);
 
   // If the tracks have different dates, choose the most common one.
-  const date = mostCommonValue(tracks, "date");
-  const genre = mostCommonValue(tracks, "genre");
+  const [date, _] = mostCommonValue(tracks, "date");
+  const [genre, __] = mostCommonValue(tracks, "genre");
 
   const albumAdd = () =>
     mpdQuery(`findadd album "${album}" albumartist "${albumartist}"`).then(() =>
@@ -70,8 +77,7 @@ export default function AlbumPage({ album, albumartist }) {
         <b>{albumartist}</b>
         {(date && ` - ${date}`) || ""}
         <br />
-        {(runHours && `${runHours} hr `) || ""}
-        {(runMinutes && `${runMinutes} min`) || ""}
+				{runTimeString(runTime)}
         <br />
         <i>Genre: {genre}</i>
         <br />
