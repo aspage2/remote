@@ -43,7 +43,12 @@ func ConfigFromYaml(fname string) (*PinState, []Pin, error) {
 	}
 
 	pins := make([]Pin, len(cfg.Channels))
-	pinNums := make([]int, len(cfg.Channels))
+
+	// Track all pins to initialize with InitGPIO
+	pinNums := make([]int, len(cfg.Channels)+1)
+
+	// When calling InitGPIO, include the AMP pin
+	pinNums[len(cfg.Channels)] = cfg.Amp.Pin
 
 	var pinState PinState
 	pinState.amp.isActive = false
