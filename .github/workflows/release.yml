@@ -20,6 +20,8 @@ jobs:
     - name: Build Frontend
       working-directory: ./web
       run: npm i -g yarn && yarn && yarn build
+      env:
+        FRONTEND_VERSION: '${{ github.ref_name }}'
 
     - name: Collect Artifacts
       run: tar -czf frontend.tar.gz ./web/dist/* ./web/static/index.html
