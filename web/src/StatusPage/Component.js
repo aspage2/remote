@@ -75,12 +75,16 @@ function ComponentVersions() {
 		<h2>Component Versions</h2>
 		<table><tbody>
 			<tr>
-				<td><b>MPD Version:</b></td>
-				<td>{vResult(mpdVersion, d=>d.version)}</td>
+				<td><b>Frontend Version:</b></td>
+				<td>{__VERSION__}</td>
 			</tr>
 			<tr>
 				<td><b>Proxy Version:</b></td>
 				<td>{vResult(proxyVersion, d=>d.version)}</td>
+			</tr>
+			<tr>
+				<td><b>MPD Version:</b></td>
+				<td>{vResult(mpdVersion, d=>d.version)}</td>
 			</tr>
 		</tbody></table>
 	</>
