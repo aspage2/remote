@@ -9,7 +9,7 @@ import urls from "../urls";
 
 export default function ArtistPage(props) {
   const { artistUnDecoded, history } = props;
-	const artist = decodeURIComponent(artistUnDecoded);
+  const artist = decodeURIComponent(artistUnDecoded);
   const { data, loaded, err } = useMPDQuery(`find albumartist "${artist}"`);
   const [show, _] = React.useState(false);
 
