@@ -1,5 +1,5 @@
 import urls from "../urls";
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, Route, Switch } from "react-router-dom";
 
 import map from "lodash/map";

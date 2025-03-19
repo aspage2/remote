@@ -40,10 +40,16 @@ export function useMPDQuery(cmd) {
   const [ls, success, err, reset] = useLoadState();
 
   useEffect(() => {
-    if (cmd !== "") {
-      reset();
-      mpdQuery(cmd).then(success).catch(err);
-    }
+		if (cmd === "") {
+			return;
+		}
+		const doit = async () => {
+			reset();
+			mpdQuery(cmd)
+				.then(success)
+				.catch(err);
+		};
+		doit().catch(err);
   }, [cmd]);
 
   return ls;

@@ -27,6 +27,5 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./web/static/index.html:/www/data/static/index.html:ro
       - ./web/dist:/www/data/static/dist:ro
-      - ./art/remote_art/static/notfound.png:/www/data/static/notfound.png:ro
     ports:
       - 80:80
