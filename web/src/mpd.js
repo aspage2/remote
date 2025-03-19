@@ -3,8 +3,14 @@
  */
 
 export async function mpdQuery(command) {
-  const resp = await fetch(`/go/cmd?q=${encodeURIComponent(command)}`);
-  return await resp.text();
+	const path = `/go/cmd?q=${encodeURIComponent(command)}`;
+  const resp = await fetch(path);
+	if (!resp.ok) {
+		const err = new Error(`${path}: ${resp.status} ${resp.statusText}`);
+		return Promise.reject(err);
+	}
+  const data = await resp.text();
+	return Promise.resolve(data);
 }
 
 export function* parsePairs(data) {

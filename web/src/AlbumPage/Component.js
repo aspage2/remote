@@ -42,8 +42,15 @@ export default function AlbumPage({ album, albumartist }) {
   const { loaded, err, data } = useMPDQuery(
     `find albumartist "${albumartist}" album "${album}"`
   );
-  if (!loaded) return <div />;
-  if (err) return <h3>Error</h3>;
+  if (!loaded) return <h2>Loading...</h2>;
+  if (err) {
+		debugger;
+		return <>
+			<h1>{album}</h1>
+			<h2>Error Fetching Data</h2>
+			<p>{data.toString()}</p>
+		</>
+	}
 
   const tracks = Array.from(tracksFromData(data));
 
