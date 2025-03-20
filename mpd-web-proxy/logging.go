@@ -10,7 +10,8 @@ import (
 // the status code returned from an HTTP handler.
 //
 // XXX - this is a barebones handler that does not implement
-//       flushing, hijacking or any of the other http interfaces.
+//
+//	flushing, hijacking or any of the other http interfaces.
 type StatusCaptureRW struct {
 	http.ResponseWriter
 	status int
@@ -30,17 +31,16 @@ func loggingMiddleware(next http.Handler) http.Handler {
 		sc := NewStatusCaptureRW(rw)
 		next.ServeHTTP(sc, req)
 
-		line := fmt.Sprintf("%s %s %d", req.RemoteAddr, req.URL.String(), sc.status) 
+		line := fmt.Sprintf("%s %s %d", req.RemoteAddr, req.URL.String(), sc.status)
 
 		switch sc.status / 100 {
-			case 3, 4:
-				slog.Warn(line)
-			case 5:
-				slog.Error(line)
-			default:
-				slog.Info(line)
+		case 3, 4:
+			slog.Warn(line)
+		case 5:
+			slog.Error(line)
+		default:
+			slog.Info(line)
 		}
 	}
 	return http.HandlerFunc(f)
 }
-
