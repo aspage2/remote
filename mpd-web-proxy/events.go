@@ -21,12 +21,18 @@ const (
 	EventTypeMPD
 )
 
+// An Event contains information about something
+// that happened on the proxy that may be of interest
+// to the frontend.
 type Event struct {
 	Type    EventType
 	Payload string
 }
 
+// SSEPayload formats the given Event
+// as a Server-Sent Event payload
 func (ev Event) SSEPayload() string {
+	var sb strings.Builder
 	var typ string
 	switch ev.Type {
 	case EventTypePing:
@@ -36,15 +42,26 @@ func (ev Event) SSEPayload() string {
 	case EventTypeServer:
 		typ = "server"
 	default:
-		typ = "???"
+		typ = ""
 	}
-	var payload = ev.Payload
-	if payload == "" {
-		payload = "none"
+	if typ != "" {
+		fmt.Fprintf(&sb, "event: %s\n", typ)
 	}
-	return fmt.Sprintf("event: %s\ndata: %s\n\n", typ, payload)
+	fmt.Fprintf(&sb, "data: %s\n", ev.Payload)
+	return sb.String() + "\n"
 }
 
+// The MPPIdler opens a connection to the MPD
+// server and receives real-time updates using the
+// `idle` command. All updates returned to the idler
+// are published to the given topic as an `mpd:{type}`
+// event.
+//
+// If the "idle" loop fails due to a dropped connection
+// or otherwise, the idler logs a "server:mpd-connection-lost"
+// event and tries to re-create the connection. After re-
+// connecting, the idler sends a `server:mpd-connected`
+// event and continues idling.
 func MPDIdler(tpc *Topic[Event]) {
 	oneRound := func() error {
 		slog.Info("start idler")
@@ -107,6 +124,8 @@ func mpdIdle(mpd net.Conn, tpc *Topic[Event]) error {
 	}
 }
 
+// getEvents wraps the given Topic[Event] with a ticker
+// that sends a `ping` event every 5 seconds.
 func getEvents(tpc *Topic[Event], ctx context.Context) chan Event {
 	ret := make(chan Event)
 	go func() {

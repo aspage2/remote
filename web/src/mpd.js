@@ -132,6 +132,5 @@ export function startMpdWatcher(
 		} else if (data === "mpd-connection-lost") {
 			setConnection(MPDNotConnected);
 		}
-
 	});
 }
