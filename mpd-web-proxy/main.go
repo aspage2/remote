@@ -26,8 +26,9 @@ const (
 )
 
 type Server struct {
-	Pins     []gpio.Pin
-	PinState *gpio.PinState
+	Pins          []gpio.Pin
+	PinState      *gpio.PinState
+	MPDStateTopic *Topic[Event]
 }
 
 func (s *Server) WriteResponse(wr io.Writer) error {
@@ -102,7 +103,7 @@ func WriteBadRequest(rw http.ResponseWriter, msg string) {
 //
 // Additionally, the endpoint will deliver "ping" events on
 // a set interval as a sort of heartbeat.
-func MpdEvents(rw http.ResponseWriter, req *http.Request) {
+func (s *Server) MpdEvents(rw http.ResponseWriter, req *http.Request) {
 	slog.Info(fmt.Sprintf("%s %s", req.RemoteAddr, req.URL))
 	defer slog.Info(fmt.Sprintf("%s %s CLIENT EXIT", req.RemoteAddr, req.URL))
 
@@ -118,18 +119,8 @@ func MpdEvents(rw http.ResponseWriter, req *http.Request) {
 		io.Copy(io.Discard, req.Body)
 	}()
 
-	mpd := Must(net.Dial("tcp", MpdAuthority))
-	defer mpd.Close()
-	events := startMPDIdler(mpd)
-	for ev := range getEvents(events, req.Context()) {
-		var eventPayload string
-		switch ev.Type {
-		case EventTypePing:
-			eventPayload = "event: ping\ndata: hello\n\n"
-		case EventTypeMPD:
-			slog.Debug(fmt.Sprintf("MPD event: %s\n", ev.Data))
-			eventPayload = fmt.Sprintf("data: %s\n\n", ev.Data)
-		}
+	for ev := range getEvents(s.MPDStateTopic, req.Context()) {
+		eventPayload := ev.SSEPayload()
 		_, err := io.WriteString(rw, eventPayload)
 		if err != nil {
 			slog.Error(
@@ -222,7 +213,9 @@ func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 func httpServer(s *Server) {
 	var nonEventMux http.ServeMux
 	nonEventMux.HandleFunc("/go/version", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(struct{Version string `json:"version"`}{version.Version})
+		json.NewEncoder(w).Encode(struct {
+			Version string `json:"version"`
+		}{version.Version})
 	})
 	nonEventMux.HandleFunc("/go/cmd", MpdCommand)
 	nonEventMux.HandleFunc("/go/mpd/version", MpdVersion)
@@ -230,7 +223,7 @@ func httpServer(s *Server) {
 	nonEventMux.HandleFunc("/go/art/{albumartist}/{album}", AlbumArt)
 
 	http.Handle("/go/", loggingMiddleware(&nonEventMux))
-	http.HandleFunc("/go/events", MpdEvents)
+	http.HandleFunc("/go/events", s.MpdEvents)
 
 	http.ListenAndServe(BindAddr, nil)
 }
@@ -251,5 +244,7 @@ func main() {
 	var s Server
 	s.PinState = ps
 	s.Pins = pins
+	s.MPDStateTopic = NewTopic[Event]()
+	go MPDIdler(s.MPDStateTopic)
 	httpServer(&s)
 }

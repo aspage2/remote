@@ -4,10 +4,14 @@
   background: #2b2b2b;
   color: white;
   display: inline-block;
+  font-weight: bold;
 
   &.active {
-    background: #3a7734;
-    color: black;
+    background: #096a00;
+  }
+
+  &.error {
+    background: #b02c40;
   }
 }
 
@@ -20,3 +24,4 @@
   font-weight: bold;
   color: red;
 }
+

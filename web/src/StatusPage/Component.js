@@ -8,6 +8,7 @@ import globalStyles from "../Global.scss";
 import { isDBUpdating, mpdQuery, objFromData } from "../mpd";
 import { Link } from "react-router-dom";
 import { PlaybackContext } from "../PlaybackControls/Context";
+import { ConnectionContext, MPDNotConnected, NotConnectedMsg, ProxyNotConnected } from "../App/Context";
 
 function SiteStats() {
   const { data, loaded, err } = useMPDQuery("stats");
@@ -90,8 +91,12 @@ function ComponentVersions() {
 	</>
 }
 
+const Connected = <span style={{fontWeight: "bold", color: "green"}}>Connected</span>
+const NotConnected = <span style={{fontWeight: "bold", color: "red"}}>Not Connected</span>
+
 export default function StatusPage() {
 
+	const { connected } = useContext(ConnectionContext);
   const { playback } = useContext(PlaybackContext);
   const updating = isDBUpdating(playback);
 
@@ -103,7 +108,7 @@ export default function StatusPage() {
 					style={{marginBottom: "20px"}}
 					className={globalStyles.globalButton}
 				>
-						 {"[$ _ ]"} Go To MPD Console 
+					{"[$ _ ]"} Go To MPD Console 
 				</div>
 		  </Link>
       <div>
@@ -118,9 +123,26 @@ export default function StatusPage() {
       </button>
 
       <div className={globalStyles.divider} />
+			<h2>Connection Status</h2>
+			<div
+				className={classNames(styles.dbUpdate, { 
+					[styles.active]: connected < ProxyNotConnected,
+					[styles.error]: connected >= ProxyNotConnected,
+				})}
+			>
+			Proxy: {connected < ProxyNotConnected ? "Connected" : "Not Connected"}
+			</div><br/><br/>
+			<div
+				className={classNames(styles.dbUpdate, { 
+					[styles.active]: connected < MPDNotConnected,
+					[styles.error]: connected >= MPDNotConnected,
+				})}
+			>
+			MPD: {connected < MPDNotConnected ? "Connected" : "Not Connected"}
+			</div>
+      <div className={globalStyles.divider} />
       <ComponentVersions/>
       <div className={globalStyles.divider} />
-
       <SiteStats />
     </React.Fragment>
   );

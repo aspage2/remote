@@ -7,6 +7,7 @@ WORKDIR /app
 ARG VERSION='development'
 
 COPY go.mod go.sum ./
+RUN go mod download
 COPY *.go ./
 COPY gpio/ ./gpio/
 COPY art/ ./art/

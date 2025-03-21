@@ -21,7 +21,7 @@ import FunPage from "../Fun";
 import NavButton from "../NavButton";
 import VolDown from "../icons/vol_down.svg";
 import VolUp from "../icons/vol_up.svg";
-import { ConnectionContext } from "./Context";
+import { ConnectionContext, NotConnectedMsg } from "./Context";
 import { QueueContext } from "../Queue/Context";
 import { PlaybackContext } from "../PlaybackControls/Context";
 
@@ -63,9 +63,9 @@ export default function App() {
           <Link_ to="/web/stats">Settings {dbUpdating ? " (U)" : ""}</Link_>
           <div
             className={styles.noConnection}
-            style={{ display: connected ? "none" : "block" }}
+            style={{ display: connected === 0 ? "none" : "block" }}
           >
-            Not Connected
+						{NotConnectedMsg(connected)}
           </div>
         </div>
       </div>

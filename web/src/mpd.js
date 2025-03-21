@@ -1,3 +1,6 @@
+
+import {Connected, ProxyNotConnected, MPDNotConnected} from "./App/Context";
+
 /**
  * Utilities issuing MPD commands/queries via `/ws/mpd/command`
  */
@@ -107,11 +110,10 @@ export function startMpdWatcher(
   showSnackbar
 ) {
   const es = new EventSource("/go/events");
-  es.onerror = () => setConnection(false);
-  es.onopen = () => setConnection(true);
-  es.addEventListener("ping", () => setConnection(true));
-  es.onmessage = function (ev) {
-    setConnection(true);
+  es.onerror = () => setConnection(ProxyNotConnected);
+  es.onopen = () => setConnection(Connected);
+	es.addEventListener("mpd", ev => {
+    setConnection(Connected);
     const changed = ev.data;
     if (STATUS_UPDATE_TYPES.includes(changed)) {
       pullPlaybackInfo().then(setPlayback);
@@ -123,5 +125,12 @@ export function startMpdWatcher(
       pullPlaybackInfo().then(setPlayback);
       showSnackbar("database update");
     }
-  };
+	});
+	es.addEventListener("server", ({data}) => {
+		if (data === "mpd-connected") {
+			setConnection(Connected);
+		} else if (data === "mpd-connection-lost") {
+			setConnection(MPDNotConnected);
+		}
+	});
 }

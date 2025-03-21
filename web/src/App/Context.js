@@ -1,6 +1,18 @@
 import React, { useState, createContext } from "react";
 
-const InitialConnectedState = false;
+export const Connected = 0;
+export const MPDNotConnected = 1;
+export const ProxyNotConnected = 2;
+
+const InitialConnectedState = ProxyNotConnected;
+
+export function NotConnectedMsg(lvl) {
+	if (lvl === ProxyNotConnected)
+		return "Proxy Connection Lost";
+	if (lvl === MPDNotConnected) 
+		return "No MPD Connection";
+	return null;
+}
 
 export const ConnectionContext = createContext({
   connected: InitialConnectedState,

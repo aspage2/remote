@@ -4,9 +4,9 @@ import "os"
 
 var (
 	MpdAuthority string
-	PinFile string
-	BindAddr string
-	MusicDir string
+	PinFile      string
+	BindAddr     string
+	MusicDir     string
 )
 
 func init() {
