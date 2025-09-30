@@ -87,6 +87,9 @@ func ReadV3Frame(rd *bufio.Reader, fr *V3Frame) error {
 		return err
 	}
 	frameType := string(frameHeader[:4])
+	if frameHeader[0] == 0 && frameHeader[1] == 0 && frameHeader[2] == 0 && frameHeader[3] == 0 {
+		return ErrNoAPIC
+	}
 	frameSize := binary.BigEndian.Uint32(frameHeader[4:8])
 	frameFlags := (uint16(frameHeader[8]) << 8) | uint16(frameHeader[9])
 	frameData := make([]byte, frameSize)
@@ -102,13 +105,14 @@ func ReadV3Frame(rd *bufio.Reader, fr *V3Frame) error {
 
 func ApicFrame(data []byte) (string, []byte, error) {
 	ptr := 1
-	for ; ptr < len(data) && data[ptr] != 0; ptr++ {}
+	for ; ptr < len(data) && data[ptr] != 0; ptr++ {
+	}
 	if ptr == len(data) {
 		return "", nil, ErrMalformedID3
 	}
 	mimeType := string(data[1:ptr])
 	ptr += 2
-	for ; ptr < len(data) && data[ptr] != 0; ptr++ {}
+	for ; ptr < len(data) && data[ptr] != 0; ptr++ {
+	}
 	return mimeType, data[ptr+1:], nil
 }
-
