@@ -7,16 +7,20 @@ import styles from "./Style.scss";
 import urls from "../urls";
 import { albumListFromData, mpdQuery, tracksFromData } from "../mpd";
 
-const AlbumItem = ({ album, albumartist, onClick }) => (
-  <div className={classnames(styles.item, styles.noPadding)} onClick={onClick}>
-    <img src={urls.albumArtUrl({ album, albumartist })} />
+function AlbumItem({ album, albumartist, onClick }) { 
+	const [err, setErr] = useState(false);
+  return <div className={classnames(styles.item, styles.noPadding)} onClick={onClick}>
+    <img 
+			src={err ? "/static/notfound.png" : urls.albumArtUrl({ album, albumartist })}
+			onError={() => setErr(true)}
+		/>
     <div>
       {album}
       <br />
       <b>{albumartist}</b>
     </div>
   </div>
-);
+};
 
 const TrackItem = ({ album, title, artist, add, onClick }) => (
   <div className={styles.item} onClick={onClick}>
@@ -51,7 +55,11 @@ function useSearchQuery(searchTerm) {
     });
     const album = new Promise((res, rej) => {
       mpdQuery(`search album "${searchTerm}"`).then((data) => {
-        res(albumListFromData(data));
+				const alb = albumListFromData(data);
+				for (const a of alb)
+					if (a.albumartist === undefined)
+						a.albumartist = a.artists[0];
+				res(alb);
       });
     });
     const track = new Promise((res, rej) => {
