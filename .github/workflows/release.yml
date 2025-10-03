@@ -24,7 +24,7 @@ jobs:
         FRONTEND_VERSION: '${{ github.ref_name }}'
 
     - name: Collect Artifacts
-      run: tar -czf frontend.tar.gz ./web/dist/* ./web/static/index.html
+      run: tar -czf frontend.tar.gz ./web/dist/* ./web/static/*
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
