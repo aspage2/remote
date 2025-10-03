@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { timeStr } from "../utils";
 import { useMPDQuery } from "../hooks";
 import urls from "../urls";
@@ -42,6 +42,7 @@ export default function AlbumPage({ album, albumartist }) {
   const { loaded, err, data } = useMPDQuery(
     `find albumartist "${albumartist}" album "${album}"`
   );
+	const [artError, setArtError] = useState(false);
   if (!loaded) return <h2>Loading...</h2>;
   if (err) {
 		debugger;
@@ -74,11 +75,16 @@ export default function AlbumPage({ album, albumartist }) {
       `findadd album "${album}" albumartist "${albumartist}" track ${track}`
     ).then(() => showSnackbar("Track added"));
 
+
   return (
     <React.Fragment>
       <h1>{album}</h1>
       <div className={`${styles.albumInfo} ${styles.column}`}>
-        <img alt={album} src={urls.albumArtUrl({ albumartist, album })} />
+        <img 
+					alt={album} 
+					src={artError ? "/static/notfound.png" : urls.albumArtUrl({ albumartist, album })}
+					onError={() => setArtError(true)}
+				/>
         <br />
         <br />
         <b>{albumartist}</b>

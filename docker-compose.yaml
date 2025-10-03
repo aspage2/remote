@@ -26,6 +26,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./web/static/index.html:/www/data/static/index.html:ro
+      - ./web/static/notfound.png:/www/data/static/notfound.png:ro
       - ./web/dist:/www/data/static/dist:ro
     ports:
       - 80:80

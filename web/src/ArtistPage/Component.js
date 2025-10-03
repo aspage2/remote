@@ -19,6 +19,10 @@ export default function ArtistPage(props) {
   const alb = albumListFromData(data);
   const albums = sortBy(alb, (album) => album.date || 10000);
 
+	for (const album of alb)
+		if (album.albumartist === undefined)
+			album.albumartist = album.artists[0];
+
   return (
     <React.Fragment>
       <h1>Albums from {artist}</h1>
@@ -31,7 +35,7 @@ export default function ArtistPage(props) {
             onClick={() =>
               history.push(
                 urls.albumPage({
-                  albumartist: album.albumartist,
+									albumartist: album.albumartist,
                   album: album.album,
                 })
               )
