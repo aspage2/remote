@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"runtime/debug"
 	"strings"
 
 	"github.com/aspage2/remote/mpd-web-proxy/art"
@@ -186,7 +187,11 @@ func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 		panic(sc.Err())
 	}
 	Must(fmt.Fprintf(conn, "search albumartist \"%s\" album \"%s\"\n", req.PathValue("albumartist"), req.PathValue("album")))
-	fname := Must(chooseAFile(sc))
+	fname, err := chooseAFile(sc)
+	if err != nil {
+		rw.WriteHeader(404)
+		return
+	}
 	fullPath := path.Join(MusicDir, fname)
 	fullDir, _ := path.Split(fullPath)
 	img, err := art.FindFolderImage(fullDir)
@@ -222,10 +227,42 @@ func httpServer(s *Server) {
 	nonEventMux.HandleFunc("/go/channels", s.Channels)
 	nonEventMux.HandleFunc("/go/art/{albumartist}/{album}", AlbumArt)
 
-	http.Handle("/go/", loggingMiddleware(&nonEventMux))
-	http.HandleFunc("/go/events", s.MpdEvents)
+	http.Handle("/go/", loggingMiddleware(&PanicCatchall{&nonEventMux}))
+	http.Handle("/go/events", &PanicCatchall{http.HandlerFunc(s.MpdEvents)})
 
 	http.ListenAndServe(BindAddr, nil)
+}
+
+
+// If PanicCatchall recovers a panicked thread, returns a 500
+// internal server error to the client.
+type PanicCatchall struct {
+	handler http.Handler
+}
+
+func (this *PanicCatchall) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	defer func() {
+		r := recover()
+		if r != nil {
+			rw.WriteHeader(500)
+			var envelope struct {
+				Message string
+				Trace string
+			}
+			switch s := r.(type) {
+			case error:
+				envelope.Message = s.Error()
+			case fmt.Stringer:
+				envelope.Message = s.String()
+			default:
+				envelope.Message = fmt.Sprintf("%v", s)
+			}
+			envelope.Trace = string(debug.Stack())
+			fmt.Fprintf(os.Stderr, "%s - %s\n", envelope.Message, envelope.Trace)
+			json.NewEncoder(rw).Encode(&envelope)
+		}
+	}()
+	this.handler.ServeHTTP(rw, req)
 }
 
 // Panic on any error.
