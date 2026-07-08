@@ -21,3 +21,4 @@ func BenchmarkFindAPICInMP3(b *testing.B) {
 		io.Copy(f, bytes.NewReader(buf))
 	}
 }
+
