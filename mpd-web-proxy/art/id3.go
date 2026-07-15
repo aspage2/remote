@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
+	"strings"
 )
 
 var (
@@ -12,7 +14,81 @@ var (
 	ErrMalformedID3 = errors.New("ID3 section malformed")
 )
 
-type ID3Header struct {
+// Parser uses a hybrid buffer + seeker to efficiently
+// traverse a file with minimal memory overhead.
+type Parser struct {
+	rs io.ReadSeeker
+	rd *bufio.Reader
+	// The position of the read head, regardless of
+	// whether or not data is buffered
+	pos int
+}
+
+func NewParser(rs io.ReadSeeker) *Parser {
+	return &Parser{
+		rs:  rs,
+		rd:  bufio.NewReader(rs),
+		pos: 0,
+	}
+}
+
+func (p *Parser) Take(buf []byte) error {
+	if n, err := io.ReadFull(p.rd, buf); err != nil {
+		return err
+	} else {
+		p.pos += n
+	}
+	return nil
+}
+
+// Drop skips the given number of bytes.
+func (p *Parser) Drop(n int) error {
+	if n <= p.rd.Buffered() {
+		_, _ = p.rd.Discard(n)
+		p.pos += n
+		return nil
+	}
+
+	if _, err := p.rs.Seek(int64(p.pos+n), io.SeekStart); err != nil {
+		return err
+	}
+	p.pos += n
+	p.rd.Reset(p.rs)
+	return nil
+}
+
+func (p *Parser) TakeOne() (byte, error) {
+	c, err := p.rd.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	p.pos += 1
+	return c, nil
+}
+
+func (p *Parser) TakeSentinel(c byte) ([]byte, error) {
+	r, err := p.rd.ReadBytes(c)
+	if errors.Is(err, io.EOF) {
+		return nil, fmt.Errorf("read string: %w", err)
+	} else if err != nil {
+		return nil, err
+	}
+	p.pos += len(r)
+	return r, nil
+}
+
+// After Escape is called, the original ReadSeeker is ensured
+// to be set to the position of the next unread byte. It is
+// unsafe to use the Parser after calling Escape.
+func (p *Parser) Escape() error {
+	if p.rd.Buffered() > 0 {
+		_, err := p.rs.Seek(int64(p.pos), io.SeekStart)
+		return err
+	}
+	return nil
+}
+
+type Header struct {
 	Major uint8
 	Minor uint8
 	Flags uint8
@@ -28,91 +104,85 @@ type ID3Header struct {
 //	bb is the minor version
 //	cc contains flags
 //	the 4 dd makes up the size of the id3 header
-func ReadID3Header(rd *bufio.Reader) (*ID3Header, error) {
-	var ret ID3Header
-	hdr := make([]byte, 10)
-	if _, err := io.ReadFull(rd, hdr); err != nil {
-		return nil, err
+func ReadID3Header(parser *Parser) (hdr Header, err error) {
+	var buf [10]byte
+	if err = parser.Take(buf[:]); err != nil {
+		return
 	}
-	if hdr[0] != 'I' || hdr[1] != 'D' || hdr[2] != '3' {
-		return nil, ErrMalformedID3
+	if buf[0] != 'I' || buf[1] != 'D' || buf[2] != '3' {
+		err = ErrMalformedID3
+		return
 	}
-	ret.Major = hdr[3]
-	ret.Minor = hdr[4]
+	hdr.Major = buf[3]
+	hdr.Minor = buf[4]
 	var size uint32
-	for _, b := range hdr[4:] {
+	for _, b := range buf[4:] {
 		if b&0x80 != 0 {
-			return nil, ErrMalformedID3
+			err = ErrMalformedID3
+			return
 		}
 		size = (size << 7) | uint32(b)
 	}
-	ret.Size = size
-	return &ret, nil
+	hdr.Size = size
+	return
 }
 
-type V2Frame struct {
-	Type string
-	Data []byte
+type V2Header struct {
+	Type [3]byte
+	Size uint32
 }
 
-func ReadV2Frame(rd *bufio.Reader, fr *V2Frame) error {
-	data := make([]byte, 6)
-	if _, err := io.ReadFull(rd, data); err != nil {
-		return err
+func ReadV2Frame(parser *Parser) (hdr V2Header, err error) {
+	var data [6]byte
+	if err = parser.Take(data[:]); err != nil {
+		return
 	}
-	frameType := string(data[:3])
-	frameSize := (uint32(data[3]) << 16) | (uint32(data[4]) << 8) | uint32(data[5])
-	ret := make([]byte, frameSize)
-	if _, err := io.ReadFull(rd, ret); err != nil {
-		return err
-	}
-	fr.Type = frameType
-	fr.Data = ret
-	return nil
+	hdr.Size = binary.BigEndian.Uint32(data[2:]) & 0xfff
+	copy(hdr.Type[:], data[:])
+	return
 }
 
-func PicFrame(data []byte) (string, []byte, error) {
-	return "", nil, nil
-}
-
-type V3Frame struct {
-	Type  string
+type V3Header struct {
+	Type  [4]byte
 	Flags uint16
-	Data  []byte
+	Size  uint32
 }
 
-func ReadV3Frame(rd *bufio.Reader, fr *V3Frame) error {
-	frameHeader := make([]byte, 10)
-	if _, err := io.ReadFull(rd, frameHeader); err != nil {
-		return err
+func TakeV3FrameHeader(parser *Parser) (hdr V3Header, err error) {
+	var frameHeader [10]byte
+	if err = parser.Take(frameHeader[:]); err != nil {
+		return
 	}
-	frameType := string(frameHeader[:4])
-	if frameHeader[0] == 0 && frameHeader[1] == 0 && frameHeader[2] == 0 && frameHeader[3] == 0 {
-		return ErrNoAPIC
-	}
-	frameSize := binary.BigEndian.Uint32(frameHeader[4:8])
-	frameFlags := (uint16(frameHeader[8]) << 8) | uint16(frameHeader[9])
-	frameData := make([]byte, frameSize)
-
-	if _, err := io.ReadFull(rd, frameData); err != nil {
-		return err
-	}
-	fr.Type = frameType
-	fr.Data = frameData
-	fr.Flags = frameFlags
-	return nil
+	hdr.Size = binary.BigEndian.Uint32(frameHeader[4:8])
+	hdr.Flags = binary.BigEndian.Uint16(frameHeader[8:])
+	copy(hdr.Type[:], frameHeader[:4])
+	return
 }
 
-func ApicFrame(data []byte) (string, []byte, error) {
-	ptr := 1
-	for ; ptr < len(data) && data[ptr] != 0; ptr++ {
+// ParseApicFrame pulls the MIMEtype of the apic image and
+// places the read head of the parser at the start of the image.
+func ParseApicFrame(parser *Parser) (string, error) {
+	enc, err := parser.TakeOne()
+	if err != nil {
+		return "", err
 	}
-	if ptr == len(data) {
-		return "", nil, ErrMalformedID3
+	mimeBytes, err := parser.TakeSentinel('\x00')
+	if err != nil {
+		return "", err
 	}
-	mimeType := string(data[1:ptr])
-	ptr += 2
-	for ; ptr < len(data) && data[ptr] != 0; ptr++ {
+	err = parser.Drop(1)
+	if err != nil {
+		return "", err
 	}
-	return mimeType, data[ptr+1:], nil
+	_, err = parser.TakeSentinel('\x00')
+	if err != nil {
+		return "", err
+	}
+	if enc != 0 {
+		err := parser.Drop(1)
+		if err != nil {
+			return "", err
+		}
+	}
+	return strings.TrimRight(string(mimeBytes), "\x00"), nil
 }

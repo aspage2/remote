@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -205,13 +204,24 @@ func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 		io.Copy(rw, f)
 		return
 	}
-	mime, data, err := art.FindAPICInMP3(fullPath)
+	f, err := os.Open(fullPath)
+	if err != nil {
+		rw.WriteHeader(500)
+		return
+	}
+	defer f.Close()
+	mime, size, err := art.FindAPICInMP3(f)
+	fmt.Printf("%d\n", size)
 	if err != nil {
 		rw.WriteHeader(404)
 		return
 	}
 	rw.Header().Set("Content-Type", mime)
-	io.Copy(rw, bytes.NewReader(data))
+	_, err = io.CopyN(rw, f, int64(size))
+	if err != nil {
+		rw.WriteHeader(500)
+		return
+	}
 }
 
 // Build the server.
@@ -233,7 +243,6 @@ func httpServer(s *Server) {
 	http.ListenAndServe(BindAddr, nil)
 }
 
-
 // If PanicCatchall recovers a panicked thread, returns a 500
 // internal server error to the client.
 type PanicCatchall struct {
@@ -247,7 +256,7 @@ func (this *PanicCatchall) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 			rw.WriteHeader(500)
 			var envelope struct {
 				Message string
-				Trace string
+				Trace   string
 			}
 			switch s := r.(type) {
 			case error:

@@ -6,8 +6,8 @@ type PinId string
 
 type pin struct {
 	activeState PhysicalState
-	isActive LogicalState
-	pin int
+	isActive    LogicalState
+	pin         int
 }
 
 func (p *pin) on(backend GPIOBackend) error {
@@ -21,11 +21,11 @@ func (p *pin) off(backend GPIOBackend) error {
 }
 
 type PinState struct {
-	pins map[PinId]*pin
+	pins      map[PinId]*pin
 	maxActive int
-	amp pin
+	amp       pin
 	numActive int
-	backend GPIOBackend
+	backend   GPIOBackend
 }
 
 func (s *PinState) pin(id PinId) (*pin, bool) {

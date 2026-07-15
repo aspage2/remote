@@ -6,24 +6,23 @@ import (
 	"github.com/go-yaml/yaml"
 )
 
-
 type PinConfig struct {
-	Id PinId `yaml:"id"`
-	Pin int `yaml:"pin"`
-	Desc string `yaml:"name"`
+	Id        PinId          `yaml:"id"`
+	Pin       int            `yaml:"pin"`
+	Desc      string         `yaml:"name"`
 	HighState *PhysicalState `yaml:"high_state"`
 }
 
 type GPIOConfig struct {
-	PinMode string `yaml:"mode"`
-	Amp PinConfig `yaml:"amp"`
-	Channels []PinConfig `yaml:"channels"`
-	HighState *PhysicalState `yaml:"highState"`
-	MaxActiveChannels *int `yaml:"maxActiveChannels"`
+	PinMode           string         `yaml:"mode"`
+	Amp               PinConfig      `yaml:"amp"`
+	Channels          []PinConfig    `yaml:"channels"`
+	HighState         *PhysicalState `yaml:"highState"`
+	MaxActiveChannels *int           `yaml:"maxActiveChannels"`
 }
 
 type Pin struct {
-	Name PinId `json:"name"`
+	Name PinId  `json:"name"`
 	Desc string `json:"desc"`
 }
 
@@ -65,7 +64,7 @@ func ConfigFromYaml(fname string) (*PinState, []Pin, error) {
 	for i, c := range cfg.Channels {
 		pinNums[i] = c.Pin
 		p := &pin{
-			pin: c.Pin,
+			pin:      c.Pin,
 			isActive: false,
 		}
 		p.activeState = globalDefaultHighState
@@ -83,4 +82,3 @@ func ConfigFromYaml(fname string) (*PinState, []Pin, error) {
 	}
 	return &pinState, pins, nil
 }
-
