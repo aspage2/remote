@@ -1,2 +1,6 @@
 build/
 mpd-web-proxy
+art.test
+*.out
+testdata/*.jpg
+
