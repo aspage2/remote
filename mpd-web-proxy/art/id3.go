@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -59,7 +58,9 @@ func (p *Parser) Drop(n int) error {
 
 func (p *Parser) TakeOne() (byte, error) {
 	c, err := p.rd.ReadByte()
-	if err != nil {
+	if errors.Is(err, io.EOF) {
+		return 0, io.ErrUnexpectedEOF
+	} else if err != nil {
 		return 0, err
 	}
 	p.pos += 1
@@ -69,7 +70,7 @@ func (p *Parser) TakeOne() (byte, error) {
 func (p *Parser) TakeSentinel(c byte) ([]byte, error) {
 	r, err := p.rd.ReadBytes(c)
 	if errors.Is(err, io.EOF) {
-		return nil, fmt.Errorf("read string: %w", err)
+		return nil, io.ErrUnexpectedEOF
 	} else if err != nil {
 		return nil, err
 	}
@@ -115,8 +116,9 @@ func ReadID3Header(parser *Parser) (hdr Header, err error) {
 	}
 	hdr.Major = buf[3]
 	hdr.Minor = buf[4]
+	hdr.Flags = buf[5]
 	var size uint32
-	for _, b := range buf[4:] {
+	for _, b := range buf[6:] {
 		if b&0x80 != 0 {
 			err = ErrMalformedID3
 			return
@@ -174,12 +176,20 @@ func ParseApicFrame(parser *Parser) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = parser.TakeSentinel('\x00')
-	if err != nil {
-		return "", err
-	}
 	if enc != 0 {
-		err := parser.Drop(1)
+		// Skip through the utf-16 encoding
+		var buf [2]byte
+		for {
+			err := parser.Take(buf[:])
+			if err != nil {
+				return "", err
+			}
+			if buf[0] == 0 && buf[1] == 0 {
+				break
+			}
+		}
+	} else {
+		_, err = parser.TakeSentinel('\x00')
 		if err != nil {
 			return "", err
 		}
