@@ -1,4 +1,5 @@
 //go:build arm || arm64
+
 package gpio
 
 import (

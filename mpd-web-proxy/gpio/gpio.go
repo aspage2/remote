@@ -10,7 +10,7 @@ type PhysicalState bool
 
 const (
 	HIGH PhysicalState = true
-	LOW PhysicalState = false
+	LOW  PhysicalState = false
 )
 
 // LogicalState represents the "activeness" of a system,
@@ -22,7 +22,7 @@ const (
 type LogicalState bool
 
 // A GPIOBackend strategy is responsible for perforing the
-// actual on/off operations of the board. 
+// actual on/off operations of the board.
 type GPIOBackend interface {
 	Set(int, PhysicalState) error
 	Close() error

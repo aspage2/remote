@@ -1,9 +1,10 @@
 package art
 
 import (
-	"bufio"
+	"io"
 	"os"
 	"path"
+	"slices"
 )
 
 func FindFolderImage(dir string) (string, error) {
@@ -22,50 +23,58 @@ func FindFolderImage(dir string) (string, error) {
 	return "", nil
 }
 
-func findAPICV2(rd *bufio.Reader, header *ID3Header) (string, []byte, error) {
-	bytesRead := 0
-	var frame V2Frame
-	for bytesRead < int(header.Size) {
-		err := ReadV2Frame(rd, &frame)
+func findAPICV2(parser *Parser, header Header) (string, error) {
+	endPos := parser.pos + int(header.Size)
+	for parser.pos < endPos {
+		frame, err := ReadV2Frame(parser)
 		if err != nil {
-			return "", nil, err
+			return "", err
 		}
-		bytesRead += 10 + len(frame.Data)
-		if frame.Type == "PIC" {
-			return "", frame.Data, nil
+		if slices.Equal(frame.Type[:], []byte("PIC")) {
+			return "", nil
 		}
 	}
-	return "", nil, ErrNoAPIC
+	return "", ErrNoAPIC
 }
 
-func findAPICV3(rd *bufio.Reader, header *ID3Header) (string, []byte, error) {
-	bytesRead := 0
-	var frame V3Frame
-	for bytesRead < int(header.Size) {
-		err := ReadV3Frame(rd, &frame)
+func findAPICV3(parser *Parser, header Header) (string, error) {
+	endPos := parser.pos + int(header.Size)
+	for parser.pos < endPos {
+		frame, err := TakeV3FrameHeader(parser)
 		if err != nil {
-			return "", nil, err
+			return "", err
 		}
-		bytesRead += 10 + len(frame.Data)
-		if frame.Type == "APIC" {
-			return ApicFrame(frame.Data)
+		if slices.Equal(frame.Type[:], []byte("APIC")) {
+			return ParseApicFrame(parser)
+		} else if frame.Type[0] == 0 && frame.Type[1] == 0 && frame.Type[2] == 0 && frame.Type[3] == 0 {
+			return "", ErrNoAPIC
+		} else {
+			parser.Drop(int(frame.Size))
 		}
 	}
-	return "", nil, ErrNoAPIC
+	return "", ErrNoAPIC
 }
 
-func FindAPICInMP3(fname string) (string, []byte, error) {
-	fh, err := os.Open(fname)
+func FindAPICInMP3(rs io.ReadSeeker) (string, uint32, error) {
+	parser := NewParser(rs)
+	header, err := ReadID3Header(parser)
 	if err != nil {
-		return "", nil, err
+		return "", 0, err
 	}
-	rd := bufio.NewReader(fh)
-	header, err := ReadID3Header(rd)
-	if err != nil {
-		return "", nil, err
-	}
+	var mime string
 	if header.Major == 2 {
-		return findAPICV2(rd, header)
+		mime, err = findAPICV2(parser, header)
+		if err != nil {
+			return "", 0, err
+		}
+	} else {
+		mime, err = findAPICV3(parser, header)
+		if err != nil {
+			return "", 0, err
+		}
 	}
-	return findAPICV3(rd, header)
+	if err := parser.Escape(); err != nil {
+		return "", 0, err
+	}
+	return mime, header.Size, nil
 }
