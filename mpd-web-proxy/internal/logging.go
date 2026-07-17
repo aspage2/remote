@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ func (lr *StatusCaptureRW) WriteHeader(code int) {
 	lr.ResponseWriter.WriteHeader(code)
 }
 
-func loggingMiddleware(next http.Handler) http.Handler {
+func LoggingMiddleware(next http.Handler) http.Handler {
 	f := func(rw http.ResponseWriter, req *http.Request) {
 		sc := NewStatusCaptureRW(rw)
 		next.ServeHTTP(sc, req)

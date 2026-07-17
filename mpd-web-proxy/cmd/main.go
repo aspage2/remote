@@ -14,9 +14,10 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/aspage2/remote/mpd-web-proxy/art"
-	"github.com/aspage2/remote/mpd-web-proxy/gpio"
-	"github.com/aspage2/remote/mpd-web-proxy/version"
+	"github.com/aspage2/remote/mpd-web-proxy/internal"
+	"github.com/aspage2/remote/mpd-web-proxy/internal/art"
+	"github.com/aspage2/remote/mpd-web-proxy/internal/gpio"
+	"github.com/aspage2/remote/mpd-web-proxy/internal/version"
 )
 
 const (
@@ -28,7 +29,7 @@ const (
 type Server struct {
 	Pins          []gpio.Pin
 	PinState      *gpio.PinState
-	MPDStateTopic *Topic[Event]
+	MPDStateTopic *internal.Topic[internal.Event]
 }
 
 func (s *Server) WriteResponse(wr io.Writer) error {
@@ -119,7 +120,7 @@ func (s *Server) MpdEvents(rw http.ResponseWriter, req *http.Request) {
 		io.Copy(io.Discard, req.Body)
 	}()
 
-	for ev := range getEvents(s.MPDStateTopic, req.Context()) {
+	for ev := range internal.GetEvents(s.MPDStateTopic, req.Context()) {
 		eventPayload := ev.SSEPayload()
 		_, err := io.WriteString(rw, eventPayload)
 		if err != nil {
@@ -141,7 +142,7 @@ func MpdCommand(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	q := qs[0]
-	data := Must(MpdQuery(q))
+	data := Must(internal.MpdQuery(q, MpdAuthority))
 	rw.Write(data)
 }
 
@@ -237,7 +238,7 @@ func httpServer(s *Server) {
 	nonEventMux.HandleFunc("/go/channels", s.Channels)
 	nonEventMux.HandleFunc("/go/art/{albumartist}/{album}", AlbumArt)
 
-	http.Handle("/go/", loggingMiddleware(&PanicCatchall{&nonEventMux}))
+	http.Handle("/go/", internal.LoggingMiddleware(&PanicCatchall{&nonEventMux}))
 	http.Handle("/go/events", &PanicCatchall{http.HandlerFunc(s.MpdEvents)})
 
 	http.ListenAndServe(BindAddr, nil)
@@ -290,7 +291,7 @@ func main() {
 	var s Server
 	s.PinState = ps
 	s.Pins = pins
-	s.MPDStateTopic = NewTopic[Event]()
-	go MPDIdler(s.MPDStateTopic)
+	s.MPDStateTopic = internal.NewTopic[internal.Event]()
+	go internal.MPDIdler(s.MPDStateTopic, MpdAuthority)
 	httpServer(&s)
 }
