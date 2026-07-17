@@ -55,5 +55,5 @@ jobs:
     - if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
-        files: junit.xml
+        files: mpd-web-proxy/junit.xml
 
