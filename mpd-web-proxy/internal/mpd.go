@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"bufio"
@@ -14,8 +14,8 @@ import (
 // MpdQuery connects and queries the MPD server
 // with the given command. Returns the response body
 // or any connection error.
-func MpdQuery(cmd string) ([]byte, error) {
-	mpd, err := net.Dial("tcp", MpdAuthority)
+func MpdQuery(cmd string, authority string) ([]byte, error) {
+	mpd, err := net.Dial("tcp", authority)
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +24,8 @@ func MpdQuery(cmd string) ([]byte, error) {
 }
 
 // A cancellable MPD Query.
-func MpdQueryContext(cmd string, ctx context.Context) ([]byte, error) {
-	mpd, err := net.Dial("tcp", MpdAuthority)
+func MpdQueryContext(cmd string, authority string, ctx context.Context) ([]byte, error) {
+	mpd, err := net.Dial("tcp", authority)
 	if err != nil {
 		return nil, err
 	}

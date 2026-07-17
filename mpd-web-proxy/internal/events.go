@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"bufio"
@@ -62,11 +62,11 @@ func (ev Event) SSEPayload() string {
 // event and tries to re-create the connection. After re-
 // connecting, the idler sends a `server:mpd-connected`
 // event and continues idling.
-func MPDIdler(tpc *Topic[Event]) {
+func MPDIdler(tpc *Topic[Event], authority string) {
 	oneRound := func() error {
 		slog.Info("start idler")
 		defer slog.Info("stop idler")
-		mpd, err := net.Dial("tcp", MpdAuthority)
+		mpd, err := net.Dial("tcp", authority)
 		if err != nil {
 			return err
 		}
@@ -124,9 +124,9 @@ func mpdIdle(mpd net.Conn, tpc *Topic[Event]) error {
 	}
 }
 
-// getEvents wraps the given Topic[Event] with a ticker
+// GetEvents wraps the given Topic[Event] with a ticker
 // that sends a `ping` event every 5 seconds.
-func getEvents(tpc *Topic[Event], ctx context.Context) chan Event {
+func GetEvents(tpc *Topic[Event], ctx context.Context) chan Event {
 	ret := make(chan Event)
 	go func() {
 		defer close(ret)

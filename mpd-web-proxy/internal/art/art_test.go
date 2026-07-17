@@ -8,8 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const DataPath = "../../testdata/file.mp3"
+
 func TestFindAPIC(t *testing.T) {
-	f, err := os.Open("../testdata/file.mp3")
+	f, err := os.Open(DataPath)
 	assert.NoError(t, err)
 
 	mime, size, err := FindAPICInMP3(f)
@@ -22,7 +24,7 @@ func TestFindAPIC(t *testing.T) {
 }
 
 func BenchmarkFindAPICInMP3(b *testing.B) {
-	f, err := os.Open("../testdata/file.mp3")
+	f, err := os.Open(DataPath)
 	if err != nil {
 		panic(err)
 	}
