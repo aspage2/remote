@@ -3,7 +3,6 @@ package internal
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -14,32 +13,19 @@ import (
 // MpdQuery connects and queries the MPD server
 // with the given command. Returns the response body
 // or any connection error.
-func MpdQuery(cmd string, authority string) ([]byte, error) {
+func MpdQuery(authority string, cmd string, args ...any) ([]byte, error) {
 	mpd, err := net.Dial("tcp", authority)
 	if err != nil {
 		return nil, err
 	}
 	defer mpd.Close()
-	return mpdQuery(cmd, mpd)
-}
-
-// A cancellable MPD Query.
-func MpdQueryContext(cmd string, authority string, ctx context.Context) ([]byte, error) {
-	mpd, err := net.Dial("tcp", authority)
-	if err != nil {
-		return nil, err
-	}
-	go func() {
-		<-ctx.Done()
-		fmt.Println("client gone. closing mpd")
-		mpd.Close()
-	}()
-	return mpdQuery(cmd, mpd)
+	return mpdQuery(mpd, cmd, args...)
 }
 
 // mpdQuery reads and parses a response stream
 // to verify that the response is valid.
-func mpdQuery(cmd string, mpd io.ReadWriter) ([]byte, error) {
+func mpdQuery(mpd io.ReadWriter, cmd string, args ...any) ([]byte, error) {
+	q := fmt.Sprintf(cmd, args...)
 	scanner := bufio.NewScanner(mpd)
 	if !scanner.Scan() {
 		if err := scanner.Err(); err != nil {
@@ -47,7 +33,7 @@ func mpdQuery(cmd string, mpd io.ReadWriter) ([]byte, error) {
 		}
 		return nil, errors.New("unexpected EOF")
 	}
-	if _, err := io.WriteString(mpd, strings.TrimSpace(cmd)+"\n"); err != nil {
+	if _, err := io.WriteString(mpd, strings.TrimSpace(q)+"\n"); err != nil {
 		return nil, err
 	}
 	var ret bytes.Buffer

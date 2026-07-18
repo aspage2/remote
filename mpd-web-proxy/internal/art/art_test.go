@@ -28,7 +28,6 @@ func BenchmarkFindAPICInMP3(b *testing.B) {
 	if err != nil {
 		panic(err)
 	}
-	nul, err := os.Open("/dev/null")
 	defer f.Close()
 	for range b.N {
 		_, err := f.Seek(0, io.SeekStart)
@@ -39,6 +38,6 @@ func BenchmarkFindAPICInMP3(b *testing.B) {
 		if err != nil {
 			panic(err)
 		}
-		io.CopyN(nul, f, int64(sz))
+		io.CopyN(io.Discard, f, int64(sz))
 	}
 }

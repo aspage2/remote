@@ -53,7 +53,7 @@ func (s *Server) PutChannel(rw http.ResponseWriter, req *http.Request) error {
 	defer req.Body.Close()
 	err := json.NewDecoder(req.Body).Decode(&envelope)
 	if err != nil {
-		WriteBadRequest(rw, fmt.Sprintf("bad json: %s", err.Error()))
+		WriteMPDErrorResponse(rw, fmt.Sprintf("bad json: %s", err.Error()))
 		return err
 	}
 	if envelope.Action == nil {
@@ -76,7 +76,7 @@ func (s *Server) PutChannel(rw http.ResponseWriter, req *http.Request) error {
 	}
 	err = action(envelope.Pin)
 	if err != nil {
-		WriteBadRequest(rw, err.Error())
+		WriteMPDErrorResponse(rw, err.Error())
 		return err
 	}
 	return nil
@@ -92,7 +92,7 @@ func (s *Server) Channels(rw http.ResponseWriter, req *http.Request) {
 	s.WriteResponse(rw)
 }
 
-func WriteBadRequest(rw http.ResponseWriter, msg string) {
+func WriteMPDErrorResponse(rw http.ResponseWriter, msg string) {
 	rw.WriteHeader(http.StatusBadRequest)
 	fmt.Fprintf(rw, "ACK: %s\n", msg)
 }
@@ -138,11 +138,11 @@ func (s *Server) MpdEvents(rw http.ResponseWriter, req *http.Request) {
 func MpdCommand(rw http.ResponseWriter, req *http.Request) {
 	qs, ok := req.URL.Query()["q"]
 	if !ok {
-		WriteBadRequest(rw, "query parameter `q` not defined")
+		WriteMPDErrorResponse(rw, "query parameter `q` not defined")
 		return
 	}
 	q := qs[0]
-	data := Must(internal.MpdQuery(q, MpdAuthority))
+	data := Must(internal.MpdQuery(MpdAuthority, q))
 	rw.Write(data)
 }
 
@@ -161,11 +161,13 @@ func MpdVersion(rw http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(rw).Encode(&payload)
 }
 
+var AlbumNotFound = errors.New("no results for provided album ID")
+
 func chooseAFile(sc *bufio.Scanner) (string, error) {
 	for sc.Scan() {
 		line := strings.TrimSpace(sc.Text())
 		if line == "OK" {
-			return "", errors.New("no file label. how???")
+			return "", AlbumNotFound
 		}
 		parts := strings.Split(line, ": ")
 		if len(parts) == 2 && parts[0] == "file" {
@@ -186,11 +188,15 @@ func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 	if sc.Err() != nil {
 		panic(sc.Err())
 	}
-	Must(fmt.Fprintf(conn, "search albumartist \"%s\" album \"%s\"\n", req.PathValue("albumartist"), req.PathValue("album")))
+	albumArtist := req.PathValue("albumartist")
+	album := req.PathValue("album")
+	Must(fmt.Fprintf(conn, "search albumartist \"%s\" album \"%s\"\n", albumArtist, album))
 	fname, err := chooseAFile(sc)
-	if err != nil {
+	if errors.Is(err, AlbumNotFound) {
 		rw.WriteHeader(404)
 		return
+	} else if err != nil {
+		panic(err)
 	}
 	fullPath := path.Join(MusicDir, fname)
 	fullDir, _ := path.Split(fullPath)
@@ -199,24 +205,39 @@ func AlbumArt(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 	if img != "" {
-		fmt.Println("found file:", img)
+		slog.Info(
+			"send folder image",
+			slog.String("albumartist", albumArtist),
+			slog.String("album", album),
+			slog.String("path", img),
+		)
 		rw.Header().Set("Content-Type", "image/jpeg")
 		f := Must(os.Open(img))
 		io.Copy(rw, f)
 		return
 	}
-	f, err := os.Open(fullPath)
-	if err != nil {
-		rw.WriteHeader(500)
-		return
-	}
+	f := Must(os.Open(fullPath))
 	defer f.Close()
 	mime, size, err := art.FindAPICInMP3(f)
-	fmt.Printf("%d\n", size)
 	if err != nil {
+		slog.Error(
+			"could not extract album art",
+			slog.String("albumartist", albumArtist),
+			slog.String("album", album),
+			slog.String("file", fullPath),
+			slog.String("message", err.Error()),
+		)
 		rw.WriteHeader(404)
 		return
 	}
+	slog.Info(
+		"send embedded album art",
+		slog.String("albumartist", albumArtist),
+		slog.String("album", album),
+		slog.String("type", mime),
+		slog.Int64("size", int64(size)),
+		slog.String("file", fullPath),
+	)
 	rw.Header().Set("Content-Type", mime)
 	_, err = io.CopyN(rw, f, int64(size))
 	if err != nil {
