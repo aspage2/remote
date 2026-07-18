@@ -1,7 +1,7 @@
 package gpio
 
 import (
-	"fmt"
+	"log/slog"
 )
 
 // PhysicalState represents the physical voltage value
@@ -35,11 +35,11 @@ func (n *NopBackend) Set(pin int, state PhysicalState) error {
 	if state {
 		newState = "HIGH"
 	}
-	fmt.Printf("\u001b[32mSet pin %d to %s\u001b[0m\n", pin, newState)
+	slog.Info("set gpio pin state", slog.Int("pin", pin), slog.String("state", newState))
 	return nil
 }
 
 func (n *NopBackend) Close() error {
-	fmt.Println("GPIO Close called")
+	slog.Info("gpio close called")
 	return nil
 }
